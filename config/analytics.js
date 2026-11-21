@@ -8,7 +8,7 @@ window.SITE_ANALYTICS_CONFIG = {
   ga4MeasurementId: "G-MPH3VDEYV0",
 
   // Microsoft Clarity Project ID (e.g., "xxxxxxxxxx")
-  clarityProjectId: ""
+  clarityProjectId: "zh37vf5w3v"
 };
 
 (function initAnalytics() {
