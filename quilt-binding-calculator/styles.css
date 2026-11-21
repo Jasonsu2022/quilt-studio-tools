@@ -5,17 +5,18 @@
 :root {
   --bg-page: #FAF7F2;
   --bg-card: #FFFFFF;
-  --bg-hero: #FDF3EE;
+  --bg-hero: #FDF2EC;
   --bg-subtle: #F4EFE6;
-  --border-card: #E6DDD0;
-  --border-strong: #CFC2B0;
+  --border-card: #E2D7C7;
+  --border-strong: #C4B5A0;
   --text-primary: #241D18;
-  --text-secondary: #5A4F46;
-  --accent-green: #2D5A4C;
-  --accent-green-hover: #23473C;
+  --text-secondary: #52473E;
+  --accent-green: #2B5447;
+  --accent-green-hover: #214238;
   --accent-green-soft: #EBF2EF;
-  --accent-terracotta: #B8502C;
-  --accent-terracotta-border: #E8C5B5;
+  --accent-terracotta: #B54A28;
+  --accent-terracotta-border: #E3BAA6;
+  --stitch-line: #D4AE9B;
   --diagram-tan: #D8BC96;
   --diagram-hatch: #C8B9A6;
 
@@ -145,15 +146,18 @@ input {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
-  font-size: 14px;
+  margin-bottom: 10px;
+  font-size: 16px;
 }
 
 .site-brand {
   color: var(--text-secondary);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.01em;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .site-brand:hover {
@@ -162,13 +166,17 @@ input {
 
 .site-nav-links {
   display: flex;
-  gap: 16px;
+  gap: 12px;
 }
 
 .site-nav-links a {
   color: var(--text-secondary);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  min-height: 48px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .site-nav-links a:hover {
@@ -219,10 +227,10 @@ input {
 .unit-switcher {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  padding: 5px;
+  gap: 10px;
+  padding: 6px;
   background: var(--bg-subtle);
-  border: 1px solid var(--border-card);
+  border: 1.5px solid var(--border-strong);
   border-radius: 14px;
   margin-bottom: 18px;
 }
@@ -230,24 +238,25 @@ input {
 .unit-btn {
   min-height: 48px;
   padding: 8px 6px;
-  border: none;
+  border: 1.5px solid var(--border-card);
   border-radius: 10px;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 14px;
+  background: #FFFFFF;
+  color: var(--text-primary);
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.25;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   text-align: center;
 }
 
 .unit-btn:hover {
-  color: var(--text-primary);
+  border-color: var(--accent-green);
 }
 
 .unit-btn[aria-pressed="true"] {
   background: var(--accent-green);
+  border-color: var(--accent-green);
   color: #FFFFFF;
 }
 
@@ -345,9 +354,9 @@ a:focus-visible {
 }
 
 .preset-btn {
-  min-height: 52px;
+  min-height: 54px;
   padding: 8px 6px;
-  border: 1.5px solid var(--border-card);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-pill);
   background: var(--bg-card);
   color: var(--text-primary);
@@ -371,7 +380,7 @@ a:focus-visible {
 }
 
 .preset-name {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.15;
 }
@@ -379,12 +388,12 @@ a:focus-visible {
 .preset-dim {
   font-size: 13px;
   font-weight: 500;
-  opacity: 0.85;
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
 .preset-btn[aria-pressed="true"] .preset-dim {
-  opacity: 0.95;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 /* Side-by-side Width x Length */
@@ -414,9 +423,14 @@ a:focus-visible {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+.num-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
 .num-input:focus {
   border-color: var(--accent-green);
-  box-shadow: 0 0 0 3px rgba(45, 90, 76, 0.14);
+  box-shadow: 0 0 0 3px rgba(43, 84, 71, 0.16);
   outline: none;
 }
 
@@ -470,13 +484,13 @@ a:focus-visible {
 .cut-style-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
 }
 
 .cut-btn {
-  min-height: 56px;
+  min-height: 58px;
   padding: 10px 12px;
-  border: 1.5px solid var(--border-card);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-control);
   background: var(--bg-card);
   color: var(--text-primary);
@@ -529,9 +543,9 @@ a:focus-visible {
 }
 
 .strip-btn {
-  min-height: 52px;
+  min-height: 54px;
   padding: 8px 4px;
-  border: 1.5px solid var(--border-card);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-pill);
   background: var(--bg-card);
   color: var(--text-primary);
@@ -541,7 +555,7 @@ a:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   transition: all 0.15s ease;
@@ -589,17 +603,17 @@ a:focus-visible {
 
 /* Advanced Options Accordion */
 .advanced-box {
-  border-top: 1px solid var(--border-card);
+  border-top: 1px dashed var(--border-strong);
   padding-top: 16px;
   margin-top: 20px;
 }
 
 .advanced-toggle {
   width: 100%;
-  min-height: 48px;
-  padding: 10px 12px;
+  min-height: 52px;
+  padding: 10px 14px;
   background: var(--bg-subtle);
-  border: 1px solid var(--border-card);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-control);
   cursor: pointer;
   display: flex;
@@ -671,17 +685,17 @@ a:focus-visible {
 .join-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
 }
 
 .join-btn {
   min-height: 48px;
   padding: 8px 10px;
-  border: 1.5px solid var(--border-card);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-pill);
   background: #FFFFFF;
   color: var(--text-primary);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -701,20 +715,20 @@ a:focus-visible {
 }
 
 .adv-reset-row {
-  padding-top: 6px;
-  border-top: 1px dashed var(--border-card);
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-strong);
   display: flex;
   justify-content: flex-end;
 }
 
 .btn-reset {
-  min-height: 44px;
-  padding: 8px 14px;
+  min-height: 48px;
+  padding: 8px 16px;
   border-radius: 10px;
-  border: 1px solid var(--border-strong);
+  border: 1.5px solid var(--border-strong);
   background: #FFFFFF;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -759,7 +773,9 @@ a:focus-visible {
 
 .buy-hero {
   text-align: center;
-  padding-bottom: 16px;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px dashed var(--stitch-line);
 }
 
 .buy-label {
@@ -772,7 +788,7 @@ a:focus-visible {
 
 .buy-value {
   margin-top: 4px;
-  font-size: 38px;
+  font-size: 40px;
   font-weight: 800;
   line-height: 1.1;
   color: var(--accent-terracotta);
@@ -788,19 +804,19 @@ a:focus-visible {
 }
 
 .buy-rounding {
-  margin-top: 3px;
-  font-size: 13px;
+  margin-top: 4px;
+  font-size: 14px;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
 .instruction-box {
   background: #FFFFFF;
-  border: 1px solid var(--border-card);
+  border: 1.5px solid var(--border-card);
   border-radius: var(--radius-control);
   padding: 16px 18px;
   font-size: 18px;
-  line-height: 1.45;
+  line-height: 1.5;
   color: var(--text-primary);
   margin-bottom: 16px;
 }
@@ -810,24 +826,37 @@ a:focus-visible {
   font-weight: 700;
 }
 
+/* Nine-Patch equal-division breakdown grid */
 .breakdown-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 0;
   margin-bottom: 18px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  overflow: hidden;
 }
 
 .breakdown-cell {
   background: #FFFFFF;
-  border: 1px solid var(--border-card);
-  border-radius: var(--radius-control);
-  padding: 12px 10px;
+  border-right: 1.5px solid var(--border-card);
+  border-top: 4px solid var(--accent-green);
+  padding: 13px 10px 12px;
   text-align: center;
+}
+
+.breakdown-cell:nth-child(2) {
+  border-top-color: var(--diagram-tan);
+}
+
+.breakdown-cell:last-child {
+  border-right: none;
 }
 
 .breakdown-label {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-secondary);
   margin-bottom: 4px;
 }
@@ -845,21 +874,23 @@ a:focus-visible {
   font-size: 12px;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 .action-row {
   display: grid;
   grid-template-columns: 1.25fr 1fr;
-  gap: 10px;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--stitch-line);
 }
 
 .btn-print,
 .btn-copy {
-  min-height: 50px;
+  min-height: 52px;
   padding: 10px 14px;
   border-radius: var(--radius-control);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -976,9 +1007,9 @@ a:focus-visible {
 }
 
 .tip-body {
-  font-size: 16px;
+  font-size: 17px;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 /* Recommendations (v1 internal placeholders only) */
@@ -1028,13 +1059,13 @@ a:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: 48px;
   padding: 8px 14px;
   border-radius: 10px;
   background: #FFFFFF;
   border: 1.5px solid var(--accent-green);
   color: var(--accent-green);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   text-decoration: none;
 }
@@ -1146,7 +1177,7 @@ a:focus-visible {
 
 .faq-item summary {
   list-style: none;
-  min-height: 52px;
+  min-height: 54px;
   padding: 14px 16px;
   font-size: 17px;
   font-weight: 700;
@@ -1177,7 +1208,7 @@ a:focus-visible {
 .faq-answer {
   padding: 0 16px 16px;
   color: var(--text-secondary);
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.6;
 }
 
@@ -1294,7 +1325,7 @@ a:focus-visible {
 
   .print-only-card {
     display: block !important;
-    border: 2px solid #241D18;
+    border: 1px dashed #241D18;
     border-radius: 10px;
     padding: 18px 20px;
     max-width: 150mm;
@@ -1308,7 +1339,7 @@ a:focus-visible {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    border-bottom: 1.5px solid #241D18;
+    border-bottom: 1px dashed #241D18;
     padding-bottom: 8px;
     margin-bottom: 12px;
   }
