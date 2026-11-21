@@ -226,7 +226,7 @@ const html = `<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./styles.css?v=1.3" />
+  <link rel="stylesheet" href="./styles.css?v=1.3.1" />
   <script id="faq-jsonld" type="application/ld+json">${faqJsonLd}</script>
   <script id="app-jsonld" type="application/ld+json">${appJsonLd}</script>
   <script id="breadcrumb-jsonld" type="application/ld+json">${breadcrumbJsonLd}</script>
@@ -239,7 +239,7 @@ const html = `<!DOCTYPE html>
         <a class="site-brand" href="../">${escapeHtml(copy.nav.siteName)}</a>
         <div class="site-nav-links">
           <a href="../">${escapeHtml(copy.nav.home)}</a>
-          <a href="../quilt-binding-calculator/">${escapeHtml(copy.nav.binding)}</a>
+          <a href="../quilt-binding-calculator/">Binding<span class="nav-hide-sm"> Calculator</span></a>
           <a href="../about/">${escapeHtml(copy.nav.about)}</a>
         </div>
       </nav>

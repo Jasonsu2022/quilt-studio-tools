@@ -184,29 +184,35 @@ input {
   text-decoration: underline;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 560px) {
   .site-nav {
-    gap: 6px;
-    font-size: 13px;
+    gap: 8px;
+    font-size: 13.5px;
     flex-wrap: nowrap;
   }
 
   .site-brand {
-    font-size: 13.5px;
+    font-size: 14px;
     white-space: nowrap;
     flex-shrink: 0;
   }
 
   .site-nav-links {
-    gap: 6px;
+    gap: 8px;
     white-space: nowrap;
     flex-shrink: 0;
   }
 
   .site-nav-links a {
     padding: 0 2px;
-    font-size: 12.5px;
+    font-size: 13px;
     white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-hide-sm {
+    display: none;
   }
 }
 
