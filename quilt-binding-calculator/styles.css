@@ -251,6 +251,24 @@ input {
   color: #FFFFFF;
 }
 
+.unit-label-full {
+  display: none;
+}
+
+.unit-label-short {
+  display: inline;
+}
+
+@media (min-width: 640px) {
+  .unit-label-full {
+    display: inline;
+  }
+
+  .unit-label-short {
+    display: none;
+  }
+}
+
 .unit-btn:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -402,6 +420,43 @@ a:focus-visible {
   outline: none;
 }
 
+.num-input.is-invalid {
+  border-color: var(--accent-terracotta);
+  background: #FFF9F6;
+}
+
+.num-input.is-invalid:focus {
+  border-color: var(--accent-terracotta);
+  box-shadow: 0 0 0 3px rgba(184, 80, 44, 0.18);
+}
+
+.field-error-msg {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-terracotta);
+  line-height: 1.35;
+}
+
+.field-error-msg[hidden] {
+  display: none;
+}
+
+.dim-warning {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #FFF8EB;
+  border: 1px solid #E5C890;
+  color: #6B4B12;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.dim-warning[hidden] {
+  display: none;
+}
+
 .input-suffix {
   position: absolute;
   right: 14px;
@@ -446,9 +501,15 @@ a:focus-visible {
 }
 
 .cut-btn-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1.2;
+}
+
+@media (min-width: 440px) {
+  .cut-btn-title {
+    font-size: 16px;
+  }
 }
 
 .cut-btn-hint {
@@ -639,6 +700,30 @@ a:focus-visible {
   display: none;
 }
 
+.adv-reset-row {
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-card);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-reset {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: #FFFFFF;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-reset:hover {
+  border-color: var(--accent-terracotta);
+  color: var(--accent-terracotta);
+}
+
 /* ==========================================================================
    Result Card (Section 3)
    ========================================================================== */
@@ -697,7 +782,14 @@ a:focus-visible {
 .buy-sub {
   margin-top: 6px;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.buy-rounding {
+  margin-top: 3px;
+  font-size: 13px;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
@@ -904,7 +996,7 @@ a:focus-visible {
 
 @media (min-width: 640px) {
   .rec-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -1111,6 +1203,63 @@ a:focus-visible {
 
 .site-footer a:hover {
   text-decoration: underline;
+}
+
+/* ==========================================================================
+   Mobile Sticky Bottom Result Bar
+   ========================================================================== */
+
+.sticky-result-bar {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  min-height: 54px;
+  padding: 10px 16px;
+  border: 1.5px solid var(--accent-terracotta-border);
+  border-radius: 14px;
+  background: var(--bg-hero);
+  box-shadow: 0 8px 24px rgba(36, 29, 24, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  color: var(--text-primary);
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+.sticky-result-bar[hidden] {
+  display: none;
+}
+
+.sticky-bar-main {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.sticky-bar-buy {
+  color: var(--accent-terracotta);
+  font-weight: 800;
+}
+
+.sticky-bar-cta {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--accent-green);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (min-width: 960px) {
+  .sticky-result-bar {
+    display: none !important;
+  }
 }
 
 /* ==========================================================================

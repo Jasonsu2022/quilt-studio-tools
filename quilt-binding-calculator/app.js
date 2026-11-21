@@ -2,8 +2,10 @@ import {
   PRESETS,
   STRIP_PRESETS,
   DEFAULTS,
+  LARGE_DIMENSION_WARNING_INCHES,
   calculateBinding,
   cmToInches,
+  parseFractionOrNumber,
   formatInchesDisplay,
   formatCmDisplay,
   formatInputFromInches
@@ -23,6 +25,7 @@ let rawInputs = {
   seam: null
 };
 let lastValidResult = null;
+let isResultCardVisible = false;
 let copyTimeout = null;
 
 /* ==========================================================================
@@ -75,14 +78,6 @@ function formatBuyMetric(result) {
   return `${result.buyMetresLabel} ${copy.units.m}`;
 }
 
-function parseUserNumber(raw) {
-  if (typeof raw !== "string") return NaN;
-  const cleaned = raw.trim().replace(",", ".");
-  if (cleaned === "") return NaN;
-  const num = Number(cleaned);
-  return Number.isFinite(num) ? num : NaN;
-}
-
 /* ==========================================================================
    State Persistence (localStorage)
    ========================================================================== */
@@ -112,7 +107,7 @@ function loadState() {
       state.isCustomStrip = parsed.isCustomStrip;
     }
   } catch {
-    // Ignore storage errors (e.g., private browsing)
+    // Ignore storage errors
   }
 }
 
@@ -122,6 +117,18 @@ function saveState() {
   } catch {
     // Ignore storage errors
   }
+}
+
+function resetToDefaults() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Ignore storage errors
+  }
+  state = { ...DEFAULTS };
+  for (const k of Object.keys(rawInputs)) rawInputs[k] = null;
+  syncInputsFromState();
+  updateUI();
 }
 
 /* ==========================================================================
@@ -165,20 +172,17 @@ function renderTips() {
 function renderRecommendations() {
   const grid = document.getElementById("recGrid");
   grid.innerHTML = copy.recommendations.items
-    .map((item) => {
-      const actionHtml = item.comingSoon
-        ? `<span class="rec-badge">${escapeHtml(item.cta)}</span>`
-        : `<a class="rec-link" href="${escapeHtml(item.href)}">${escapeHtml(item.cta)}</a>`;
-      return `
-        <article class="rec-item">
-          <div>
-            <h3>${escapeHtml(item.title)}</h3>
-            <p>${escapeHtml(item.desc)}</p>
-          </div>
-          ${actionHtml}
-        </article>
-      `;
-    })
+    .map(
+      (item) => `
+      <article class="rec-item">
+        <div>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.desc)}</p>
+        </div>
+        <a class="rec-link" href="${escapeHtml(item.href)}">${escapeHtml(item.cta)}</a>
+      </article>
+    `
+    )
     .join("");
 }
 
@@ -412,7 +416,6 @@ function updateToggleStates() {
   const seamDrawer = document.getElementById("seamDrawer");
   seamDrawer.hidden = state.joinType !== "straight";
 
-  // Advanced summary text
   const advExpanded = document.getElementById("advancedToggle").getAttribute("aria-expanded") === "true";
   document.getElementById("advancedActionPill").textContent = advExpanded
     ? copy.advanced.done
@@ -442,6 +445,63 @@ function updateToggleStates() {
     });
   }
   document.getElementById("advancedSummary").textContent = summaryText;
+}
+
+/* ==========================================================================
+   Field-Level Validation & Large-Dimension Warning
+   ========================================================================== */
+
+function applyFieldErrors(fieldErrors) {
+  const fields = [
+    { key: "width", inputId: "inputWidth", errId: "errWidth" },
+    { key: "length", inputId: "inputLength", errId: "errLength" },
+    { key: "stripWidth", inputId: "inputCustomStrip", errId: "errCustomStrip" },
+    { key: "wof", inputId: "inputWof", errId: "errWof" },
+    { key: "extra", inputId: "inputExtra", errId: "errExtra" },
+    { key: "squaring", inputId: "inputSquaring", errId: "errSquaring" },
+    { key: "seam", inputId: "inputSeam", errId: "errSeam" }
+  ];
+
+  for (const f of fields) {
+    const input = document.getElementById(f.inputId);
+    const errEl = document.getElementById(f.errId);
+    const errKey = fieldErrors[f.key];
+    if (errKey) {
+      if (input) {
+        input.classList.add("is-invalid");
+        input.setAttribute("aria-invalid", "true");
+      }
+      if (errEl) {
+        errEl.textContent = copy.validation[errKey] || copy.validation.positiveNumber;
+        errEl.hidden = false;
+      }
+    } else {
+      if (input) {
+        input.classList.remove("is-invalid");
+        input.removeAttribute("aria-invalid");
+      }
+      if (errEl) {
+        errEl.textContent = "";
+        errEl.hidden = true;
+      }
+    }
+  }
+
+  // Gentle non-blocking warning if width or length > 150"
+  const warnEl = document.getElementById("dimWarning");
+  const isLarge =
+    (Number.isFinite(state.width) && state.width > LARGE_DIMENSION_WARNING_INCHES) ||
+    (Number.isFinite(state.length) && state.length > LARGE_DIMENSION_WARNING_INCHES);
+  if (warnEl) {
+    warnEl.textContent = isLarge ? copy.warnings.largeDimension : "";
+    warnEl.hidden = !isLarge;
+  }
+}
+
+function updateStickyBarVisibility() {
+  const bar = document.getElementById("stickyResultBar");
+  if (!bar) return;
+  bar.hidden = !lastValidResult || isResultCardVisible;
 }
 
 /* ==========================================================================
@@ -525,7 +585,6 @@ function buildStraightSvg(result) {
           <line x1="0" y1="0" x2="0" y2="10" stroke="#C8B9A6" stroke-width="4" />
         </pattern>
       </defs>
-      <!-- Top WOF dimension bar -->
       <line x1="${padX}" y1="26" x2="${padX + rectW}" y2="26" stroke="#241D18" stroke-width="1.5" />
       <line x1="${padX}" y1="20" x2="${padX}" y2="32" stroke="#241D18" stroke-width="1.5" />
       <line x1="${padX + rectW}" y1="20" x2="${padX + rectW}" y2="32" stroke="#241D18" stroke-width="1.5" />
@@ -547,7 +606,6 @@ function buildBiasSvg(result) {
   const y = 46;
   const size = 220;
 
-  // 45° diagonal lines inside square clipped to square
   const diagLines = [];
   for (let offset = -size + 28; offset < size; offset += 28) {
     diagLines.push(
@@ -563,43 +621,36 @@ function buildBiasSvg(result) {
         </clipPath>
       </defs>
 
-      <!-- Top dimension -->
       <line x1="${x}" y1="26" x2="${x + size}" y2="26" stroke="#241D18" stroke-width="1.5" />
       <line x1="${x}" y1="20" x2="${x}" y2="32" stroke="#241D18" stroke-width="1.5" />
       <line x1="${x + size}" y1="20" x2="${x + size}" y2="32" stroke="#241D18" stroke-width="1.5" />
       <rect x="${x + size / 2 - 42}" y="14" width="84" height="22" rx="4" fill="#FAF7F2" />
       <text x="${x + size / 2}" y="29" text-anchor="middle" fill="#241D18" font-family="Plus Jakarta Sans, sans-serif" font-size="14" font-weight="700">${escapeHtml(sqText)}</text>
 
-      <!-- Left dimension -->
       <line x1="68" y1="${y}" x2="68" y2="${y + size}" stroke="#241D18" stroke-width="1.5" />
       <line x1="62" y1="${y}" x2="74" y2="${y}" stroke="#241D18" stroke-width="1.5" />
       <line x1="62" y1="${y + size}" x2="74" y2="${y + size}" stroke="#241D18" stroke-width="1.5" />
       <text x="58" y="${y + size / 2 + 5}" text-anchor="end" fill="#241D18" font-family="Plus Jakarta Sans, sans-serif" font-size="14" font-weight="700">${escapeHtml(sqText)}</text>
 
-      <!-- Square base -->
       <rect x="${x}" y="${y}" width="${size}" height="${size}" fill="#F3E7D3" stroke="#241D18" stroke-width="2" />
 
-      <!-- 45 degree bias slice lines -->
       <g clip-path="url(#biasSquareClip)">
         ${diagLines.join("")}
-        <!-- Highlighted center bias strip band -->
         <polygon points="${x},${y + size - 16} ${x + size - 16},${y} ${x + size},${y} ${x + size},${y + 16} ${x + 16},${y + size} ${x},${y + size}" fill="#2D5A4C" fill-opacity="0.22" />
       </g>
 
-      <!-- Center label pill -->
       <g transform="translate(${x + size / 2}, ${y + size / 2}) rotate(-45)">
         <rect x="-72" y="-14" width="144" height="28" rx="6" fill="#2D5A4C" stroke="#241D18" stroke-width="1.2" />
         <text x="0" y="5" text-anchor="middle" fill="#FFFFFF" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="700">${escapeHtml(stripLabel)}</text>
       </g>
 
-      <!-- 45° angle indicator -->
       <text x="${x + size - 10}" y="${y + size - 10}" text-anchor="end" fill="#241D18" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="700">45° bias</text>
     </svg>
   `;
 }
 
 /* ==========================================================================
-   Results & Print Card Rendering
+   Results, Sticky Bar & Print Card Rendering
    ========================================================================== */
 
 function updateUI() {
@@ -608,6 +659,8 @@ function updateUI() {
   updateToggleStates();
 
   const res = calculateBinding(state);
+  applyFieldErrors(res.fieldErrors || {});
+
   const errorEl = document.getElementById("resultError");
   const validEl = document.getElementById("resultValid");
   const diagramCard = document.getElementById("diagramCard");
@@ -618,6 +671,7 @@ function updateUI() {
     errorEl.hidden = false;
     validEl.hidden = true;
     diagramCard.hidden = true;
+    updateStickyBarVisibility();
     return;
   }
 
@@ -630,16 +684,26 @@ function updateUI() {
   const buyUnit = getBuyUnit();
 
   const primaryBuy = buyUnit === "yd" ? formatBuyImperial(res) : formatBuyMetric(res);
+  const primaryBuyShort = buyUnit === "yd" ? formatBuyImperialShort(res) : formatBuyMetric(res);
   const altBuy = buyUnit === "yd" ? formatBuyMetric(res) : formatBuyImperialShort(res);
 
   document.getElementById("buyValue").textContent = primaryBuy;
 
+  const altBuyNote =
+    buyUnit === "yd"
+      ? interpolate(copy.results.altBuyMetric, { altBuy })
+      : interpolate(copy.results.altBuyImperial, { altBuy });
+
   const squaringStr = formatLen(state.squaring, inputUnit);
   const buySubText =
     state.squaring > 0
-      ? interpolate(copy.results.squaringNote, { altBuy, squaring: squaringStr })
-      : interpolate(copy.results.noSquaringNote, { altBuy });
+      ? `${altBuyNote} · ${interpolate(copy.results.includesSquaring, { squaring: squaringStr })}`
+      : altBuyNote;
   document.getElementById("buySub").textContent = buySubText;
+
+  const roundingText =
+    buyUnit === "yd" ? copy.results.roundingImperial : copy.results.roundingMetric;
+  document.getElementById("buyRounding").textContent = roundingText;
 
   // Natural-language Cutting Instruction
   const stripWidthStr = formatLen(state.stripWidth, inputUnit);
@@ -656,10 +720,19 @@ function updateUI() {
     });
   } else {
     const squareStr = formatLen(res.biasSquareInches, inputUnit);
-    instructionHtml = interpolate(copy.results.instructionBias, {
-      square: squareStr,
-      stripWidth: stripWidthStr
-    });
+    if (res.panels > 1) {
+      instructionHtml = interpolate(copy.results.instructionBiasPieced, {
+        square: squareStr,
+        wof: wofStr,
+        panels: res.panels,
+        stripWidth: stripWidthStr
+      });
+    } else {
+      instructionHtml = interpolate(copy.results.instructionBias, {
+        square: squareStr,
+        stripWidth: stripWidthStr
+      });
+    }
   }
   document.getElementById("cuttingInstruction").innerHTML = instructionHtml;
 
@@ -671,23 +744,41 @@ function updateUI() {
   });
 
   const exactFabricVal = formatLen(res.fabricInches, inputUnit);
-  const netFabric = res.cutStyle === "straight" ? res.stripsFabricInches : res.netFabricInches;
-  const exactFabricSub = interpolate(copy.results.exactFabricSub, {
-    netFabric: formatLen(netFabric, inputUnit),
-    squaring: squaringStr
-  });
+  let exactFabricSub;
+  if (res.cutStyle === "straight") {
+    exactFabricSub = interpolate(copy.results.exactFabricSub, {
+      netFabric: formatLen(res.stripsFabricInches, inputUnit),
+      squaring: squaringStr
+    });
+  } else if (res.panels > 1) {
+    exactFabricSub = interpolate(copy.results.exactFabricSubBiasPieced, {
+      panels: res.panels,
+      square: formatLen(res.biasSquareInches, inputUnit),
+      squaring: squaringStr
+    });
+  } else {
+    exactFabricSub = interpolate(copy.results.exactFabricSubBias, {
+      square: formatLen(res.biasSquareInches, inputUnit),
+      squaring: squaringStr
+    });
+  }
 
-  let countLabel, countVal, countSub;
+  let countLabel, countVal, countSub, stickyDetail;
   if (res.cutStyle === "straight") {
     const stripWord = res.strips === 1 ? copy.results.stripSingular : copy.results.stripPlural;
     countLabel = copy.results.stripsLabel;
     countVal = `${res.strips} ${stripWord}`;
     countSub = interpolate(copy.results.stripsSub, { stripWidth: stripWidthStr });
+    stickyDetail = countVal;
   } else {
     const sqStr = formatLen(res.biasSquareInches, inputUnit);
     countLabel = copy.results.squareLabel;
     countVal = `${sqStr} × ${sqStr}`;
-    countSub = copy.results.squareSub;
+    countSub =
+      res.panels > 1
+        ? interpolate(copy.results.squareSubPieced, { panels: res.panels })
+        : copy.results.squareSub;
+    stickyDetail = `${sqStr} × ${sqStr} sq`;
   }
 
   document.getElementById("bdTotalVal").textContent = totalBindingVal;
@@ -698,6 +789,10 @@ function updateUI() {
   document.getElementById("bdCountVal").textContent = countVal;
   document.getElementById("bdCountSub").textContent = countSub;
 
+  // Mobile sticky bar content
+  document.getElementById("stickyBarText").innerHTML = `${escapeHtml(copy.stickyBar.buyPrefix)} <span class="sticky-bar-buy">${escapeHtml(primaryBuyShort)}</span> · ${escapeHtml(stickyDetail)}`;
+  updateStickyBarVisibility();
+
   // Diagram
   const svgMarkup = res.cutStyle === "straight" ? buildStraightSvg(res) : buildBiasSvg(res);
   document.getElementById("diagramStage").innerHTML = svgMarkup;
@@ -705,7 +800,7 @@ function updateUI() {
   // Sync Print Cutting Card
   syncPrintCard({
     primaryBuy,
-    buySubText,
+    buySubText: `${buySubText} · ${roundingText}`,
     instructionHtml,
     totalBindingVal,
     totalBindingSub,
@@ -774,6 +869,10 @@ function buildPlainTextPlan() {
   const size = `${formatLen(state.width, inputUnit)} × ${formatLen(state.length, inputUnit)}`;
   const buy = buyUnit === "yd" ? formatBuyImperial(res) : formatBuyMetric(res);
   const altBuy = buyUnit === "yd" ? formatBuyMetric(res) : formatBuyImperialShort(res);
+  const altBuyNote =
+    buyUnit === "yd"
+      ? interpolate(copy.results.altBuyMetric, { altBuy })
+      : interpolate(copy.results.altBuyImperial, { altBuy });
   const stripWidth = formatLen(state.stripWidth, inputUnit);
   const wof = formatLen(state.wof, inputUnit);
   const totalBinding = formatLen(res.totalLength, inputUnit);
@@ -785,7 +884,7 @@ function buildPlainTextPlan() {
     return interpolate(copy.actions.copyTemplateStraight, {
       size,
       buy,
-      altBuy,
+      altBuyNote,
       strips: res.strips,
       stripWord,
       stripWidth,
@@ -797,10 +896,25 @@ function buildPlainTextPlan() {
   }
 
   const square = formatLen(res.biasSquareInches, inputUnit);
+  if (res.panels > 1) {
+    return interpolate(copy.actions.copyTemplateBiasPieced, {
+      size,
+      buy,
+      altBuyNote,
+      panels: res.panels,
+      wof,
+      square,
+      stripWidth,
+      totalBinding,
+      exactFabric,
+      squaring
+    });
+  }
+
   return interpolate(copy.actions.copyTemplateBias, {
     size,
     buy,
-    altBuy,
+    altBuyNote,
     square,
     stripWidth,
     totalBinding,
@@ -839,16 +953,17 @@ async function handleCopyPlan() {
 }
 
 /* ==========================================================================
-   Event Wiring
+   Event Wiring & Sticky Observer
    ========================================================================== */
 
 function bindNumericInput(elId, stateKey, rawKey) {
   const el = document.getElementById(elId);
   el.addEventListener("input", () => {
     rawInputs[rawKey] = el.value;
-    const parsed = parseUserNumber(el.value);
+    const isInches = getInputUnit() === "in";
+    const parsed = parseFractionOrNumber(el.value, isInches);
     if (Number.isFinite(parsed)) {
-      state[stateKey] = getInputUnit() === "cm" ? cmToInches(parsed) : parsed;
+      state[stateKey] = isInches ? parsed : cmToInches(parsed);
       saveState();
     } else {
       state[stateKey] = NaN;
@@ -858,20 +973,37 @@ function bindNumericInput(elId, stateKey, rawKey) {
 
   el.addEventListener("blur", () => {
     if (Number.isFinite(state[stateKey])) {
-      rawInputs[rawKey] = null;
-      el.value = formatInputFromInches(state[stateKey], getInputUnit());
+      // Keep user's readable fraction text if they typed one; otherwise normalize cleanly
+      const raw = rawInputs[rawKey];
+      if (!raw || !raw.includes("/")) {
+        rawInputs[rawKey] = null;
+        el.value = formatInputFromInches(state[stateKey], getInputUnit());
+      }
     }
   });
 }
 
+function setupStickyObserver() {
+  const resultCard = document.getElementById("resultCard");
+  if (!resultCard || typeof IntersectionObserver === "undefined") return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      isResultCardVisible = entries.some((e) => e.isIntersecting);
+      updateStickyBarVisibility();
+    },
+    { threshold: 0.12 }
+  );
+  observer.observe(resultCard);
+}
+
 function bindEvents() {
-  // Unit switcher — NEVER mutates internal inches, only updates display unit!
+  // Unit switcher — NEVER mutates internal inches
   document.querySelectorAll(".unit-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const nextMode = btn.dataset.unit;
       if (nextMode === state.unitMode) return;
       state.unitMode = nextMode;
-      // Clear transient raw strings so inputs display cleanly converted from exact internalInches
       for (const k of Object.keys(rawInputs)) rawInputs[k] = null;
       syncInputsFromState();
       saveState();
@@ -907,6 +1039,21 @@ function bindEvents() {
     updateToggleStates();
   });
 
+  // Reset to defaults
+  const btnReset = document.getElementById("btnReset");
+  if (btnReset) {
+    btnReset.addEventListener("click", resetToDefaults);
+  }
+
+  // Sticky bar smooth scroll to Result Card
+  const stickyBar = document.getElementById("stickyResultBar");
+  if (stickyBar) {
+    stickyBar.addEventListener("click", () => {
+      const rc = document.getElementById("resultCard");
+      if (rc) rc.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
   // Numeric inputs
   bindNumericInput("inputWidth", "width", "width");
   bindNumericInput("inputLength", "length", "length");
@@ -938,6 +1085,7 @@ async function init() {
   renderSeoAndChart();
   renderFaqAndJsonLd();
   bindEvents();
+  setupStickyObserver();
   syncInputsFromState();
   updateUI();
 }

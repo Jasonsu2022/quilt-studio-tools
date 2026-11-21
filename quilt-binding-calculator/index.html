@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Quilt Binding Calculator — Instant Strips, Yardage &amp; Cutting Diagram</title>
-  <meta name="description" content="Free quilt binding calculator for straight-of-grain and bias binding. Instantly find how many strips to cut, yardage or metres to buy at the fabric shop, and print a handy cutting card." />
+  <meta name="description" content="Free quilt binding calculator for straight-of-grain and continuous bias binding. Instantly find how many strips to cut, yardage or metres to buy at the fabric shop, and print a handy cutting card." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
+  <script id="faq-jsonld" type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Should I use 2¼\" or 2½\" binding strips?","acceptedAnswer":{"@type":"Answer","text":"Both make double-fold (French fold) binding. 2½\" is the most common choice because it wraps easily around medium-loft batting and gives a slightly wider margin for machine or hand stitching on the back. Choose 2¼\" if you prefer a tighter, crisper finish with thin cotton batting."}},{"@type":"Question","name":"Why does the calculator add 12 inches of extra length?","acceptedAnswer":{"@type":"Answer","text":"Turning four neat 90° mitered corners and overlapping the beginning and ending tails for a hidden diagonal join takes extra binding length. Adding 12\" (about 30 cm) ensures you will never come up a few inches short on the final seam."}},{"@type":"Question","name":"Why is a 2-inch squaring allowance included in the yardage?","acceptedAnswer":{"@type":"Answer","text":"Fabric cut at the shop bolt is rarely perfectly on-grain. Adding 2\" (about 5 cm) lets you straighten the cut edge with your rotary cutter before slicing your first binding strip or cutting your bias square, without coming up short."}},{"@type":"Question","name":"When do I actually need bias binding?","acceptedAnswer":{"@type":"Answer","text":"You need bias binding whenever your quilt has curved or scalloped edges so the binding can ease around bends without puckering. Some quilters also prefer bias binding on heavily used bed quilts because the diagonal weave resists edge wear longer."}},{"@type":"Question","name":"Can I make quilt binding from a Fat Quarter?","acceptedAnswer":{"@type":"Answer","text":"Yes, for small projects like wall hangings, table runners, or baby quilts. A standard fat quarter is roughly 18\" × 21\", which yields usable strips about 20\" wide after trimming selvedges. Enter 20\" as your Usable WOF in Advanced Options to calculate strips from fat quarters."}},{"@type":"Question","name":"How is the continuous bias starting square and fabric yardage calculated?","acceptedAnswer":{"@type":"Answer","text":"We multiply your total binding length by your strip width and by a 1.10 continuous-bias cutting allowance for diagonal seam joins, then take the square root and round up to the next whole inch for your starting square. Your shop yardage is then based on the full square side plus your squaring allowance (and automatically accounts for piecing multiple fabric widths if the square is wider than your usable WOF)."}}]}</script>
   <script defer src="../config/analytics.js"></script>
 </head>
 <body>
@@ -16,23 +17,32 @@
     <!-- Section 1: Minimal Top Bar + 3-Way Unit Switcher -->
     <div class="top-header-wrap no-print">
       <nav class="site-nav" aria-label="Site navigation">
-        <a class="site-brand" href="../" data-i18n="nav.siteName"></a>
+        <a class="site-brand" href="../" data-i18n="nav.siteName">Quilt Studio Tools</a>
         <div class="site-nav-links">
-          <a href="../" data-i18n="nav.home"></a>
-          <a href="../about/" data-i18n="nav.about"></a>
+          <a href="../" data-i18n="nav.home">Home</a>
+          <a href="../about/" data-i18n="nav.about">About</a>
         </div>
       </nav>
 
       <div class="header-row">
         <header class="page-header">
-          <h1 data-i18n="header.title"></h1>
-          <p class="page-subtitle" data-i18n="header.subtitle"></p>
+          <h1 data-i18n="header.title">Quilt Binding Calculator</h1>
+          <p class="page-subtitle" data-i18n="header.subtitle">Instant strips, yardage &amp; cutting diagram</p>
         </header>
 
-        <div class="unit-switcher" role="group" id="unitSwitcher">
-          <button type="button" class="unit-btn" data-unit="imperial" aria-pressed="true" data-i18n="units.imperial"></button>
-          <button type="button" class="unit-btn" data-unit="metric" aria-pressed="false" data-i18n="units.metric"></button>
-          <button type="button" class="unit-btn" data-unit="mixed" aria-pressed="false" data-i18n="units.mixed"></button>
+        <div class="unit-switcher" role="group" id="unitSwitcher" aria-label="Measurement units">
+          <button type="button" class="unit-btn" data-unit="imperial" aria-pressed="true">
+            <span class="unit-label-full" data-i18n="units.imperial">Imperial (in / yd)</span>
+            <span class="unit-label-short" data-i18n="units.imperialShort">in / yd</span>
+          </button>
+          <button type="button" class="unit-btn" data-unit="metric" aria-pressed="false">
+            <span class="unit-label-full" data-i18n="units.metric">Metric (cm / m)</span>
+            <span class="unit-label-short" data-i18n="units.metricShort">cm / m</span>
+          </button>
+          <button type="button" class="unit-btn" data-unit="mixed" aria-pressed="false">
+            <span class="unit-label-full" data-i18n="units.mixed">Mixed (in / m)</span>
+            <span class="unit-label-short" data-i18n="units.mixedShort">in / m</span>
+          </button>
         </div>
       </div>
     </div>
@@ -44,57 +54,96 @@
         <!-- 2.1 Quilt Size Presets -->
         <div class="field-group">
           <div class="field-header">
-            <span class="field-label" data-i18n="presets.label"></span>
-            <span class="custom-badge" id="customPresetBadge" hidden data-i18n="presets.custom"></span>
+            <span class="field-label" data-i18n="presets.label">Quilt Size</span>
+            <span class="custom-badge" id="customPresetBadge" hidden data-i18n="presets.custom">Custom</span>
           </div>
-          <div class="preset-grid" id="presetGrid"></div>
+          <div class="preset-grid" id="presetGrid">
+            <button type="button" class="preset-btn" data-preset="baby" aria-pressed="false">
+              <span class="preset-name">Baby</span>
+              <span class="preset-dim">36×52"</span>
+            </button>
+            <button type="button" class="preset-btn" data-preset="throw" aria-pressed="true">
+              <span class="preset-name">Throw</span>
+              <span class="preset-dim">50×65"</span>
+            </button>
+            <button type="button" class="preset-btn" data-preset="twin" aria-pressed="false">
+              <span class="preset-name">Twin</span>
+              <span class="preset-dim">70×90"</span>
+            </button>
+            <button type="button" class="preset-btn" data-preset="queen" aria-pressed="false">
+              <span class="preset-name">Queen</span>
+              <span class="preset-dim">90×108"</span>
+            </button>
+            <button type="button" class="preset-btn" data-preset="king" aria-pressed="false">
+              <span class="preset-name">King</span>
+              <span class="preset-dim">108×108"</span>
+            </button>
+          </div>
         </div>
 
         <!-- 2.2 Width x Length -->
         <div class="field-group">
           <div class="dim-row">
             <div>
-              <label class="field-label" for="inputWidth" data-i18n="inputs.width"></label>
+              <label class="field-label" for="inputWidth" data-i18n="inputs.width">Quilt Width</label>
               <div class="input-wrap" style="margin-top: 8px;">
-                <input id="inputWidth" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
-                <span class="input-suffix" data-unit-suffix></span>
+                <input id="inputWidth" class="num-input" type="text" inputmode="decimal" autocomplete="off" value="50" />
+                <span class="input-suffix" data-unit-suffix>in</span>
               </div>
+              <p class="field-error-msg" id="errWidth" hidden role="alert"></p>
             </div>
             <div>
-              <label class="field-label" for="inputLength" data-i18n="inputs.length"></label>
+              <label class="field-label" for="inputLength" data-i18n="inputs.length">Quilt Length</label>
               <div class="input-wrap" style="margin-top: 8px;">
-                <input id="inputLength" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
-                <span class="input-suffix" data-unit-suffix></span>
+                <input id="inputLength" class="num-input" type="text" inputmode="decimal" autocomplete="off" value="65" />
+                <span class="input-suffix" data-unit-suffix>in</span>
               </div>
+              <p class="field-error-msg" id="errLength" hidden role="alert"></p>
             </div>
           </div>
+          <div class="dim-warning" id="dimWarning" hidden role="status"></div>
         </div>
 
         <!-- 2.3 Cut Style -->
         <div class="field-group">
-          <span class="field-label" style="margin-bottom: 10px;" data-i18n="inputs.cutStyle.label"></span>
+          <span class="field-label" style="margin-bottom: 10px;" data-i18n="inputs.cutStyle.label">Cut Style</span>
           <div class="cut-style-grid" role="group">
             <button type="button" class="cut-btn" data-cut-style="straight" aria-pressed="true">
-              <span class="cut-btn-title" data-i18n="inputs.cutStyle.straight"></span>
-              <span class="cut-btn-hint" data-i18n="inputs.cutStyle.straightHint"></span>
+              <span class="cut-btn-title" data-i18n="inputs.cutStyle.straight">Straight-of-Grain</span>
+              <span class="cut-btn-hint" data-i18n="inputs.cutStyle.straightHint">Standard quilts</span>
             </button>
             <button type="button" class="cut-btn" data-cut-style="bias" aria-pressed="false">
-              <span class="cut-btn-title" data-i18n="inputs.cutStyle.bias"></span>
-              <span class="cut-btn-hint" data-i18n="inputs.cutStyle.biasHint"></span>
+              <span class="cut-btn-title" data-i18n="inputs.cutStyle.bias">Bias</span>
+              <span class="cut-btn-hint" data-i18n="inputs.cutStyle.biasHint">Curved edges</span>
             </button>
           </div>
         </div>
 
         <!-- 2.4 Strip Width -->
         <div class="field-group">
-          <span class="field-label" style="margin-bottom: 10px;" data-i18n="inputs.stripWidth.label"></span>
-          <div class="strip-grid" id="stripGrid"></div>
+          <span class="field-label" style="margin-bottom: 10px;" data-i18n="inputs.stripWidth.label">Binding Strip Width</span>
+          <div class="strip-grid" id="stripGrid">
+            <button type="button" class="strip-btn" data-strip="2.25" aria-pressed="false">
+              <span>2¼"</span>
+            </button>
+            <button type="button" class="strip-btn" data-strip="2.5" aria-pressed="true">
+              <span>2½"</span>
+              <span class="strip-tag">Most common</span>
+            </button>
+            <button type="button" class="strip-btn" data-strip="3" aria-pressed="false">
+              <span>3"</span>
+            </button>
+            <button type="button" class="strip-btn" data-strip="custom" aria-pressed="false">
+              <span>Custom</span>
+            </button>
+          </div>
           <div class="custom-strip-drawer" id="customStripDrawer" hidden>
-            <label for="inputCustomStrip" data-i18n="inputs.stripWidth.customLabel"></label>
+            <label for="inputCustomStrip" data-i18n="inputs.stripWidth.customLabel">Custom strip width (e.g. 2 1/8 or 2.625)</label>
             <div class="input-wrap">
-              <input id="inputCustomStrip" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
-              <span class="input-suffix" data-unit-suffix></span>
+              <input id="inputCustomStrip" class="num-input" type="text" inputmode="decimal" autocomplete="off" value="2.5" />
+              <span class="input-suffix" data-unit-suffix>in</span>
             </div>
+            <p class="field-error-msg" id="errCustomStrip" hidden role="alert"></p>
           </div>
         </div>
 
@@ -102,53 +151,61 @@
         <div class="advanced-box">
           <button type="button" class="advanced-toggle" id="advancedToggle" aria-expanded="false" aria-controls="advancedPanel">
             <span class="advanced-toggle-text">
-              <span class="advanced-title" data-i18n="advanced.toggle"></span>
-              <span class="advanced-summary" id="advancedSummary"></span>
+              <span class="advanced-title" data-i18n="advanced.toggle">Advanced Options</span>
+              <span class="advanced-summary" id="advancedSummary">Usable WOF 42&quot; · Extra 12&quot; · 45° Diagonal Join · Squaring 2&quot;</span>
             </span>
-            <span class="advanced-action-pill" id="advancedActionPill"></span>
+            <span class="advanced-action-pill" id="advancedActionPill">Edit</span>
           </button>
 
           <div class="advanced-panel" id="advancedPanel" hidden>
             <div class="adv-field">
-              <label for="inputWof" data-i18n="advanced.wof"></label>
+              <label for="inputWof" data-i18n="advanced.wof">Usable Fabric Width (WOF)</label>
               <div class="input-wrap">
-                <input id="inputWof" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
-                <span class="input-suffix" data-unit-suffix></span>
+                <input id="inputWof" class="num-input" type="text" inputmode="decimal" autocomplete="off" value="42" />
+                <span class="input-suffix" data-unit-suffix>in</span>
               </div>
-              <p class="adv-hint" data-i18n="advanced.wofHint"></p>
+              <p class="field-error-msg" id="errWof" hidden role="alert"></p>
+              <p class="adv-hint" data-i18n="advanced.wofHint">Selvedges already removed (standard quilting cotton is 42&quot; / 106.7 cm usable).</p>
             </div>
 
             <div class="adv-field">
-              <label for="inputExtra" data-i18n="advanced.extra"></label>
+              <label for="inputExtra" data-i18n="advanced.extra">Corner &amp; Join Extra</label>
               <div class="input-wrap">
-                <input id="inputExtra" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
-                <span class="input-suffix" data-unit-suffix></span>
+                <input id="inputExtra" class="num-input" type="text" inputmode="decimal" autocomplete="off" value="12" />
+                <span class="input-suffix" data-unit-suffix>in</span>
               </div>
-              <p class="adv-hint" data-i18n="advanced.extraHint"></p>
+              <p class="field-error-msg" id="errExtra" hidden role="alert"></p>
+              <p class="adv-hint" data-i18n="advanced.extraHint">Added to the perimeter for mitered corners and final join overlap.</p>
             </div>
 
             <div class="adv-field" id="joinMethodField">
-              <label data-i18n="advanced.joinType"></label>
+              <label data-i18n="advanced.joinType">Strip Join Method</label>
               <div class="join-row" role="group">
-                <button type="button" class="join-btn" data-join-type="diagonal" aria-pressed="true" data-i18n="advanced.diagonal"></button>
-                <button type="button" class="join-btn" data-join-type="straight" aria-pressed="false" data-i18n="advanced.straight"></button>
+                <button type="button" class="join-btn" data-join-type="diagonal" aria-pressed="true" data-i18n="advanced.diagonal">45° Diagonal Join</button>
+                <button type="button" class="join-btn" data-join-type="straight" aria-pressed="false" data-i18n="advanced.straight">Straight Seam</button>
               </div>
               <div class="seam-drawer" id="seamDrawer" hidden>
-                <label for="inputSeam" data-i18n="advanced.seam"></label>
+                <label for="inputSeam" data-i18n="advanced.seam">Seam Allowance</label>
                 <div class="input-wrap">
-                  <input id="inputSeam" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
-                  <span class="input-suffix" data-unit-suffix></span>
+                  <input id="inputSeam" class="num-input" type="text" inputmode="decimal" autocomplete="off" value="0.25" />
+                  <span class="input-suffix" data-unit-suffix>in</span>
                 </div>
+                <p class="field-error-msg" id="errSeam" hidden role="alert"></p>
               </div>
             </div>
 
             <div class="adv-field">
-              <label for="inputSquaring" data-i18n="advanced.squaring"></label>
+              <label for="inputSquaring" data-i18n="advanced.squaring">Fabric Squaring Allowance</label>
               <div class="input-wrap">
-                <input id="inputSquaring" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
-                <span class="input-suffix" data-unit-suffix></span>
+                <input id="inputSquaring" class="num-input" type="text" inputmode="decimal" autocomplete="off" value="2" />
+                <span class="input-suffix" data-unit-suffix>in</span>
               </div>
-              <p class="adv-hint" data-i18n="advanced.squaringHint"></p>
+              <p class="field-error-msg" id="errSquaring" hidden role="alert"></p>
+              <p class="adv-hint" data-i18n="advanced.squaringHint">Extra cut length to true up the fabric edge before slicing strips or cutting your bias square.</p>
+            </div>
+
+            <div class="adv-reset-row">
+              <button type="button" class="btn-reset" id="btnReset" data-i18n="advanced.reset">Reset to defaults</button>
             </div>
           </div>
         </div>
@@ -157,48 +214,49 @@
       <!-- Right Column: Section 3 (Result Card) + Section 4 (SVG Diagram) -->
       <div class="results-column">
         <!-- Section 3: Result Card -->
-        <section class="result-card" aria-live="polite">
+        <section class="result-card" id="resultCard" aria-live="polite">
           <div class="result-error" id="resultError" hidden></div>
 
           <div class="result-valid" id="resultValid">
             <div class="buy-hero">
-              <div class="buy-label" data-i18n="results.buyHeading"></div>
-              <div class="buy-value" id="buyValue"></div>
-              <div class="buy-sub" id="buySub"></div>
+              <div class="buy-label" data-i18n="results.buyHeading">Buy at the Fabric Shop</div>
+              <div class="buy-value" id="buyValue">5/8 yard</div>
+              <div class="buy-sub" id="buySub">Or buy 0.50 m (metric shop) · includes 2&quot; squaring</div>
+              <div class="buy-rounding" id="buyRounding">Rounded up to the nearest 1/8 yard</div>
             </div>
 
-            <div class="instruction-box" id="cuttingInstruction"></div>
+            <div class="instruction-box" id="cuttingInstruction">Cut <strong>7 strips</strong>, each <strong>2½"</strong> wide across your <strong>42"</strong> usable fabric width.</div>
 
             <div class="breakdown-grid">
               <div class="breakdown-cell">
-                <div class="breakdown-label" data-i18n="results.totalBinding"></div>
-                <div class="breakdown-value" id="bdTotalVal"></div>
-                <div class="breakdown-sub" id="bdTotalSub"></div>
+                <div class="breakdown-label" data-i18n="results.totalBinding">Total Binding</div>
+                <div class="breakdown-value" id="bdTotalVal">242"</div>
+                <div class="breakdown-sub" id="bdTotalSub">230" + 12" extra</div>
               </div>
               <div class="breakdown-cell">
-                <div class="breakdown-label" data-i18n="results.exactFabric"></div>
-                <div class="breakdown-value" id="bdFabricVal"></div>
-                <div class="breakdown-sub" id="bdFabricSub"></div>
+                <div class="breakdown-label" data-i18n="results.exactFabric">Exact Fabric</div>
+                <div class="breakdown-value" id="bdFabricVal">19½"</div>
+                <div class="breakdown-sub" id="bdFabricSub">17½" + 2" squaring</div>
               </div>
               <div class="breakdown-cell">
-                <div class="breakdown-label" id="bdCountLabel"></div>
-                <div class="breakdown-value" id="bdCountVal"></div>
-                <div class="breakdown-sub" id="bdCountSub"></div>
+                <div class="breakdown-label" id="bdCountLabel">Strips to Cut</div>
+                <div class="breakdown-value" id="bdCountVal">7 strips</div>
+                <div class="breakdown-sub" id="bdCountSub">at 2½" each</div>
               </div>
             </div>
 
             <div class="action-row">
-              <button type="button" class="btn-print" id="btnPrint" data-i18n="actions.printCard"></button>
-              <button type="button" class="btn-copy" id="btnCopy" data-i18n="actions.copyPlan"></button>
+              <button type="button" class="btn-print" id="btnPrint" data-i18n="actions.printCard">Print Cutting Card</button>
+              <button type="button" class="btn-copy" id="btnCopy" data-i18n="actions.copyPlan">Copy Plan</button>
             </div>
           </div>
         </section>
 
         <!-- Section 4: Dynamic SVG Cutting Diagram -->
         <section class="card diagram-card" id="diagramCard">
-          <h2 data-i18n="diagram.heading"></h2>
+          <h2 data-i18n="diagram.heading">Cutting Diagram</h2>
           <div class="diagram-stage" id="diagramStage"></div>
-          <p class="diagram-note" data-i18n="diagram.scaleNote"></p>
+          <p class="diagram-note" data-i18n="diagram.scaleNote">Schematic only — follow the labeled measurements, not screen scale.</p>
         </section>
       </div>
     </main>
@@ -207,40 +265,172 @@
     <div class="content-sections no-print">
       <!-- Section 5: 3 Before-You-Cut Tips -->
       <section class="card" id="before-you-cut">
-        <h2 class="section-heading" data-i18n="tips.heading"></h2>
-        <ol class="tips-list" id="tipsList"></ol>
+        <h2 class="section-heading" data-i18n="tips.heading">Before You Cut</h2>
+        <ol class="tips-list" id="tipsList">
+          <li class="tip-item">
+            <span class="tip-num" aria-hidden="true">1</span>
+            <div>
+              <div class="tip-title">Measure through the center</div>
+              <p class="tip-body">Measure your quilt's width and length through the center rather than along the outer edges, which can stretch during quilting.</p>
+            </div>
+          </li>
+          <li class="tip-item">
+            <span class="tip-num" aria-hidden="true">2</span>
+            <div>
+              <div class="tip-title">Trim selvedges first</div>
+              <p class="tip-body">The default 42&quot; (106.7 cm) usable width already removes both selvedges. If your fabric shrank after pre-washing, lower WOF in Advanced Options.</p>
+            </div>
+          </li>
+          <li class="tip-item">
+            <span class="tip-num" aria-hidden="true">3</span>
+            <div>
+              <div class="tip-title">45° diagonal joins reduce bulk</div>
+              <p class="tip-body">Straight-of-grain strips are calculated with 45° diagonal seam loss built in so joins lie flat as they cross your quilt edges.</p>
+            </div>
+          </li>
+        </ol>
       </section>
 
-      <!-- Section 6: Helpful Tools & Guides (v1 Internal Placeholders Only) -->
+      <!-- Section 6: Helpful Tools & Guides (v1 Internal References) -->
       <section class="card" id="helpful-tools">
-        <h2 class="section-heading" data-i18n="recommendations.heading"></h2>
-        <p class="rec-disclosure" data-i18n="recommendations.disclosure"></p>
-        <div class="rec-grid" id="recGrid"></div>
+        <h2 class="section-heading" data-i18n="recommendations.heading">Helpful Tools &amp; Guides</h2>
+        <p class="rec-disclosure" data-i18n="recommendations.disclosure">Quick references from Quilt Studio Tools</p>
+        <div class="rec-grid" id="recGrid">
+          <article class="rec-item">
+            <div>
+              <h3>Before-You-Cut Binding Checklist</h3>
+              <p>Three quick habits to avoid short strips, wavy edges, and bulky binding seams.</p>
+            </div>
+            <a class="rec-link" href="#before-you-cut">Read tips</a>
+          </article>
+          <article class="rec-item">
+            <div>
+              <h3>Standard Quilt Binding Quick Chart</h3>
+              <p>At-a-glance strip counts and yardage for Baby, Throw, Twin, Queen, and King quilts.</p>
+            </div>
+            <a class="rec-link" href="#quick-chart">View chart</a>
+          </article>
+        </div>
       </section>
 
       <!-- Section 7: SEO Copy + Standard Quilt Quick Chart + FAQ -->
       <section class="card" id="guide-section">
-        <div id="seoBlocks"></div>
+        <div id="seoBlocks">
+        <div class="seo-block">
+          <h2>How to Calculate Quilt Binding</h2>
+          <p>To calculate quilt binding accurately, start by finding your quilt's perimeter: add the width and length, then multiply by two. Next, add 12 inches of extra length to give yourself comfortable room for four mitered corners and the final diagonal join where the two ends meet.</p>
+          <p>Divide that total binding length by your usable fabric width minus the seam loss for each strip join (one strip width for 45° diagonal joins, or twice the seam allowance for straight seams), and round up to a whole number of strips. Finally, multiply the strip count by your strip width, add 2 inches for squaring up the fabric edge, and round up to the nearest 1/8 yard (or 0.05 metre).</p>
+        </div>
+        <div class="seo-block">
+          <h2>Straight vs. Bias Binding: Which Should You Choose?</h2>
+          <p>Straight-of-grain binding is cut perpendicular to the selvedges across the width of fabric (WOF). It is faster to cut, uses less fabric, and is the best everyday choice for rectangular quilts with straight edges.</p>
+          <p>Continuous bias binding starts from a single fabric square cut diagonally at 45° and sewn into a tube so you can cut one long bias strip with minimal waste. Because bias fabric stretches smoothly around curves and distributes wear across both warp and weft threads, choose bias binding for scalloped borders, circular quilts, or heirloom quilts that will be washed frequently.</p>
+        </div>
+        </div>
 
         <div class="chart-wrap" id="quick-chart">
-          <h2 data-i18n="seo.chartHeading"></h2>
-          <p class="chart-note" data-i18n="seo.chartNote"></p>
+          <h2 data-i18n="seo.chartHeading">Standard Quilt Sizes &amp; Binding Quick Chart</h2>
+          <p class="chart-note" data-i18n="seo.chartNote">Calculated with 2½&quot; straight-of-grain strips, 42&quot; usable WOF, 12&quot; extra, 45° diagonal joins, and 2&quot; squaring.</p>
           <div class="table-scroll">
-            <table class="quick-table" id="quickChartTable"></table>
+            <table class="quick-table" id="quickChartTable">
+            <thead>
+              <tr>
+                <th>Quilt Size</th>
+                <th>Dimensions</th>
+                <th>Total Binding</th>
+                <th>2½&quot; Strips</th>
+                <th>Buy (yd)</th>
+                <th>Buy (m)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Baby</strong></td>
+                <td>36" × 52"</td>
+                <td>188"</td>
+                <td>5</td>
+                <td class="highlight-buy">1/2 yd</td>
+                <td>0.40 m</td>
+              </tr>
+              <tr>
+                <td><strong>Throw</strong></td>
+                <td>50" × 65"</td>
+                <td>242"</td>
+                <td>7</td>
+                <td class="highlight-buy">5/8 yd</td>
+                <td>0.50 m</td>
+              </tr>
+              <tr>
+                <td><strong>Twin</strong></td>
+                <td>70" × 90"</td>
+                <td>332"</td>
+                <td>9</td>
+                <td class="highlight-buy">3/4 yd</td>
+                <td>0.65 m</td>
+              </tr>
+              <tr>
+                <td><strong>Queen</strong></td>
+                <td>90" × 108"</td>
+                <td>408"</td>
+                <td>11</td>
+                <td class="highlight-buy">7/8 yd</td>
+                <td>0.75 m</td>
+              </tr>
+              <tr>
+                <td><strong>King</strong></td>
+                <td>108" × 108"</td>
+                <td>444"</td>
+                <td>12</td>
+                <td class="highlight-buy">1 yd</td>
+                <td>0.85 m</td>
+              </tr>
+            </tbody>
+            </table>
           </div>
         </div>
       </section>
 
       <section class="card" id="faq-section">
-        <h2 class="section-heading" data-i18n="faq.heading"></h2>
-        <div class="faq-list" id="faqList"></div>
+        <h2 class="section-heading" data-i18n="faq.heading">Frequently Asked Questions</h2>
+        <div class="faq-list" id="faqList">
+          <details class="faq-item">
+            <summary>Should I use 2¼&quot; or 2½&quot; binding strips?</summary>
+            <div class="faq-answer">Both make double-fold (French fold) binding. 2½&quot; is the most common choice because it wraps easily around medium-loft batting and gives a slightly wider margin for machine or hand stitching on the back. Choose 2¼&quot; if you prefer a tighter, crisper finish with thin cotton batting.</div>
+          </details>
+          <details class="faq-item">
+            <summary>Why does the calculator add 12 inches of extra length?</summary>
+            <div class="faq-answer">Turning four neat 90° mitered corners and overlapping the beginning and ending tails for a hidden diagonal join takes extra binding length. Adding 12&quot; (about 30 cm) ensures you will never come up a few inches short on the final seam.</div>
+          </details>
+          <details class="faq-item">
+            <summary>Why is a 2-inch squaring allowance included in the yardage?</summary>
+            <div class="faq-answer">Fabric cut at the shop bolt is rarely perfectly on-grain. Adding 2&quot; (about 5 cm) lets you straighten the cut edge with your rotary cutter before slicing your first binding strip or cutting your bias square, without coming up short.</div>
+          </details>
+          <details class="faq-item">
+            <summary>When do I actually need bias binding?</summary>
+            <div class="faq-answer">You need bias binding whenever your quilt has curved or scalloped edges so the binding can ease around bends without puckering. Some quilters also prefer bias binding on heavily used bed quilts because the diagonal weave resists edge wear longer.</div>
+          </details>
+          <details class="faq-item">
+            <summary>Can I make quilt binding from a Fat Quarter?</summary>
+            <div class="faq-answer">Yes, for small projects like wall hangings, table runners, or baby quilts. A standard fat quarter is roughly 18&quot; × 21&quot;, which yields usable strips about 20&quot; wide after trimming selvedges. Enter 20&quot; as your Usable WOF in Advanced Options to calculate strips from fat quarters.</div>
+          </details>
+          <details class="faq-item">
+            <summary>How is the continuous bias starting square and fabric yardage calculated?</summary>
+            <div class="faq-answer">We multiply your total binding length by your strip width and by a 1.10 continuous-bias cutting allowance for diagonal seam joins, then take the square root and round up to the next whole inch for your starting square. Your shop yardage is then based on the full square side plus your squaring allowance (and automatically accounts for piecing multiple fabric widths if the square is wider than your usable WOF).</div>
+          </details>
+        </div>
       </section>
 
       <footer class="site-footer">
-        <span data-i18n="footer.copyright"></span>
-        <a href="../about/" data-i18n="footer.aboutLink"></a>
+        <span data-i18n="footer.copyright">Quilt Studio Tools — Free quilting calculators.</span>
+        <a href="../about/" data-i18n="footer.aboutLink">About &amp; Contact</a>
       </footer>
     </div>
+
+    <!-- Mobile Sticky Bottom Result Bar -->
+    <button type="button" class="sticky-result-bar no-print" id="stickyResultBar" hidden>
+      <span class="sticky-bar-main" id="stickyBarText"></span>
+      <span class="sticky-bar-cta" data-i18n="stickyBar.viewDetails">Details</span>
+    </button>
 
     <!-- Dedicated Print Cutting Card (@media print only) -->
     <section class="print-only-card" id="printCard" aria-hidden="true">

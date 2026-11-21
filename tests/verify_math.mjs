@@ -2,10 +2,16 @@ import assert from "node:assert/strict";
 import {
   calculateBinding,
   DEFAULTS,
+  parseFractionOrNumber,
+  formatInchesDisplay,
   formatInputFromInches,
   cmToInches,
   inchesToCm
 } from "../quilt-binding-calculator/calculator.js";
+
+// =========================================================================
+// Straight-of-Grain Regression Cases (0–4, unchanged from v1.0)
+// =========================================================================
 
 // Case 0: Default (Throw 50x65, S=2.5, WOF=42)
 const c0 = calculateBinding(DEFAULTS);
@@ -48,33 +54,93 @@ assert.equal(c4.strips, 8);
 assert.equal(c4.fabricInches, 26);
 assert.equal(c4.buyYardsLabel, "3/4");
 
-// Case 5: 60x72, S=2.5, WOF=42, Bias
-const c5 = calculateBinding({ ...DEFAULTS, width: 60, length: 72, cutStyle: "bias" });
-assert.equal(c5.valid, true);
-assert.equal(c5.biasSquareInches, 29);
-assert.ok(Math.abs(c5.fabricInches - 20.892857) < 0.01);
-assert.equal(c5.buyYardsLabel, "5/8");
-assert.equal(c5.buyMetresLabel, "0.55");
+// =========================================================================
+// Bias New Acceptance Cases (B1–B5, v1.1 Continuous Bias Square + panels)
+// =========================================================================
 
-// Case 6: Unit conversion display without mutating internalInches
-const internalW = 60;
-const asCm = formatInputFromInches(internalW, "cm");
-assert.equal(asCm, "152.4");
-const backIn = formatInputFromInches(internalW, "in");
-assert.equal(backIn, "60");
+// B1: 60x72, S=2.5, WOF=42, Bias -> sq 28", fabric 30", 7/8 yd, 0.80 m
+const b1 = calculateBinding({ ...DEFAULTS, width: 60, length: 72, cutStyle: "bias" });
+assert.equal(b1.valid, true);
+assert.equal(b1.biasSquareInches, 28);
+assert.equal(b1.panels, 1);
+assert.equal(b1.fabricInches, 30);
+assert.equal(b1.buyYardsLabel, "7/8");
+assert.equal(b1.buyMetresLabel, "0.80");
+
+// B2: 60x80, S=2.5, WOF=42, Bias -> total 292", sq 29", fabric 31", 7/8 yd, 0.80 m
+const b2 = calculateBinding({ ...DEFAULTS, width: 60, length: 80, cutStyle: "bias" });
+assert.equal(b2.valid, true);
+assert.equal(b2.totalLength, 292);
+assert.equal(b2.biasSquareInches, 29);
+assert.equal(b2.panels, 1);
+assert.equal(b2.fabricInches, 31);
+assert.equal(b2.buyYardsLabel, "7/8");
+assert.equal(b2.buyMetresLabel, "0.80");
+
+// B3: Throw 50x65, S=2.5, WOF=42, Bias -> sq 26", fabric 28", 7/8 yd, 0.75 m
+const b3 = calculateBinding({ ...DEFAULTS, width: 50, length: 65, cutStyle: "bias" });
+assert.equal(b3.valid, true);
+assert.equal(b3.biasSquareInches, 26);
+assert.equal(b3.panels, 1);
+assert.equal(b3.fabricInches, 28);
+assert.equal(b3.buyYardsLabel, "7/8");
+assert.equal(b3.buyMetresLabel, "0.75");
+
+// B4: Queen 90x108, S=2.5, WOF=42, Bias -> sq 34", fabric 36", 1 yd, 0.95 m
+const b4 = calculateBinding({ ...DEFAULTS, width: 90, length: 108, cutStyle: "bias" });
+assert.equal(b4.valid, true);
+assert.equal(b4.biasSquareInches, 34);
+assert.equal(b4.panels, 1);
+assert.equal(b4.fabricInches, 36);
+assert.equal(b4.buyYardsLabel, "1");
+assert.equal(b4.buyMetresLabel, "0.95");
+
+// B5: King 108x108, S=3.0, WOF=36, Bias -> sq 39" > 36 -> panels=2, fabric 82", 2 3/8 yd
+const b5 = calculateBinding({
+  ...DEFAULTS,
+  width: 108,
+  length: 108,
+  stripWidth: 3.0,
+  wof: 36,
+  cutStyle: "bias"
+});
+assert.equal(b5.valid, true);
+assert.equal(b5.biasSquareInches, 39);
+assert.equal(b5.panels, 2);
+assert.equal(b5.fabricInches, 82);
+assert.equal(b5.buyYardsLabel, "2 3/8");
+
+// =========================================================================
+// Fraction Parsing & 1/8-Inch Display Cases (F1–F2)
+// =========================================================================
+
+// F1: "2 1/8" -> 2.125 -> "2⅛"
+assert.equal(parseFractionOrNumber("2 1/8", true), 2.125);
+assert.equal(formatInchesDisplay(2.125), "2⅛");
+assert.equal(parseFractionOrNumber("100 1/2", true), 100.5);
+assert.equal(parseFractionOrNumber("3/8", true), 0.375);
+
+// F2: 2.625 -> "2⅝", 0.375 -> "⅜"
+assert.equal(formatInchesDisplay(2.625), "2⅝");
+assert.equal(formatInchesDisplay(0.375), "⅜");
+assert.equal(formatInchesDisplay(0.875), "⅞");
+
+// Unit conversion round-trip without drift
+assert.equal(formatInputFromInches(60, "cm"), "152.4");
+assert.equal(formatInputFromInches(60, "in"), "60");
 assert.ok(Math.abs(cmToInches(inchesToCm(50)) - 50) < 1e-12);
 
-// Edge / Validation cases
+// Field-level validation checks
 const e1 = calculateBinding({ ...DEFAULTS, width: 0 });
 assert.equal(e1.valid, false);
-assert.equal(e1.errorKey, "positiveNumber");
+assert.equal(e1.fieldErrors.width, "widthPositive");
 
 const e2 = calculateBinding({ ...DEFAULTS, stripWidth: 42, wof: 42 });
 assert.equal(e2.valid, false);
-assert.equal(e2.errorKey, "stripTooWide");
+assert.equal(e2.fieldErrors.stripWidth, "stripTooWide");
 
 const e3 = calculateBinding({ ...DEFAULTS, joinType: "straight", seam: 21, wof: 42 });
 assert.equal(e3.valid, false);
-assert.equal(e3.errorKey, "invalidSeam");
+assert.equal(e3.fieldErrors.seam, "invalidSeam");
 
-console.log("ALL 7 ACCEPTANCE CASES + 3 VALIDATION CASES PASSED!");
+console.log("ALL v1.1 REGRESSION (0-4) + BIAS (B1-B5) + FRACTION (F1-F2) + VALIDATION TESTS PASSED!");

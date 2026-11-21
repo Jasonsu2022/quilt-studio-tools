@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Quilt Binding Calculator — Instant Strips, Yardage & Cutting Diagram",
-    "description": "Free quilt binding calculator for straight-of-grain and bias binding. Instantly find how many strips to cut, yardage or metres to buy at the fabric shop, and print a handy cutting card."
+    "description": "Free quilt binding calculator for straight-of-grain and continuous bias binding. Instantly find how many strips to cut, yardage or metres to buy at the fabric shop, and print a handy cutting card."
   },
   "nav": {
     "siteName": "Quilt Studio Tools",
@@ -18,6 +18,9 @@
     "imperial": "Imperial (in / yd)",
     "metric": "Metric (cm / m)",
     "mixed": "Mixed (in / m)",
+    "imperialShort": "in / yd",
+    "metricShort": "cm / m",
+    "mixedShort": "in / m",
     "in": "in",
     "cm": "cm",
     "yd": "yd",
@@ -48,15 +51,16 @@
       "label": "Binding Strip Width",
       "mostCommon": "Most common",
       "custom": "Custom",
-      "customLabel": "Custom strip width"
+      "customLabel": "Custom strip width (e.g. 2 1/8 or 2.625)"
     }
   },
   "advanced": {
     "toggle": "Advanced Options",
     "edit": "Edit",
     "done": "Hide",
+    "reset": "Reset to defaults",
     "summaryTemplate": "Usable WOF {wof} · Extra {extra} · {join} · Squaring {squaring}",
-    "summaryBiasTemplate": "Usable WOF {wof} · Extra {extra} · Bias (1.15×) · Squaring {squaring}",
+    "summaryBiasTemplate": "Usable WOF {wof} · Extra {extra} · Continuous Bias (1.10×) · Squaring {squaring}",
     "wof": "Usable Fabric Width (WOF)",
     "wofHint": "Selvedges already removed (standard quilting cotton is 42\" / 106.7 cm usable).",
     "extra": "Corner & Join Extra",
@@ -66,31 +70,43 @@
     "straight": "Straight Seam",
     "seam": "Seam Allowance",
     "squaring": "Fabric Squaring Allowance",
-    "squaringHint": "Extra cut length to true up the fabric edge before slicing strips."
+    "squaringHint": "Extra cut length to true up the fabric edge before slicing strips or cutting your bias square."
   },
   "results": {
     "buyHeading": "Buy at the Fabric Shop",
-    "squaringNote": "≈ {altBuy} · includes {squaring} squaring",
-    "noSquaringNote": "≈ {altBuy}",
+    "altBuyMetric": "Or buy {altBuy} (metric shop)",
+    "altBuyImperial": "Or buy {altBuy} (imperial shop)",
+    "roundingImperial": "Rounded up to the nearest 1/8 yard",
+    "roundingMetric": "Rounded up to the nearest 0.05 m",
+    "includesSquaring": "includes {squaring} squaring",
     "instructionStraight": "Cut <strong>{strips} {stripWord}</strong>, each <strong>{stripWidth}</strong> wide across your <strong>{wof}</strong> usable fabric width.",
-    "instructionBias": "Cut a <strong>{square} × {square} square</strong>, then slice <strong>{stripWidth}</strong> bias strips on the 45° diagonal.",
+    "instructionBias": "Cut a <strong>{square} × {square} square</strong>, then make continuous <strong>{stripWidth}</strong> bias binding on the 45° diagonal.",
+    "instructionBiasPieced": "Your <strong>{square} × {square} square</strong> is wider than your <strong>{wof}</strong> usable fabric width — sew <strong>{panels} widths</strong> together first, then cut the square and make continuous <strong>{stripWidth}</strong> bias binding.",
     "stripSingular": "strip",
     "stripPlural": "strips",
     "totalBinding": "Total Binding",
     "totalBindingSub": "{perimeter} + {extra} extra",
     "exactFabric": "Exact Fabric",
     "exactFabricSub": "{netFabric} + {squaring} squaring",
+    "exactFabricSubBias": "{square} square + {squaring} squaring",
+    "exactFabricSubBiasPieced": "{panels} × ({square} + {squaring} squaring)",
     "stripsLabel": "Strips to Cut",
     "stripsSub": "at {stripWidth} each",
     "squareLabel": "Bias Square",
-    "squareSub": "cut on 45° bias"
+    "squareSub": "continuous bias method",
+    "squareSubPieced": "piece {panels} widths first"
+  },
+  "stickyBar": {
+    "buyPrefix": "Buy",
+    "viewDetails": "Details"
   },
   "actions": {
     "printCard": "Print Cutting Card",
     "copyPlan": "Copy Plan",
     "copied": "Copied!",
-    "copyTemplateStraight": "Quilt Binding Plan ({size}, Straight-of-Grain)\nBuy at shop: {buy} (≈ {altBuy})\nCut: {strips} {stripWord} × {stripWidth} wide across {wof} usable WOF\nTotal binding: {totalBinding} | Exact fabric: {exactFabric} (includes {squaring} squaring)",
-    "copyTemplateBias": "Quilt Binding Plan ({size}, Bias)\nBuy at shop: {buy} (≈ {altBuy})\nCut: {square} × {square} square, then slice {stripWidth} bias strips on 45° diagonal\nTotal binding: {totalBinding} | Exact fabric: {exactFabric} (includes {squaring} squaring)"
+    "copyTemplateStraight": "Quilt Binding Plan ({size}, Straight-of-Grain)\nBuy at shop: {buy} ({altBuyNote})\nCut: {strips} {stripWord} × {stripWidth} wide across {wof} usable WOF\nTotal binding: {totalBinding} | Exact fabric: {exactFabric} (includes {squaring} squaring)",
+    "copyTemplateBias": "Quilt Binding Plan ({size}, Continuous Bias)\nBuy at shop: {buy} ({altBuyNote})\nCut: {square} × {square} square, then make continuous {stripWidth} bias binding on 45° diagonal\nTotal binding: {totalBinding} | Exact fabric: {exactFabric} (includes {squaring} squaring)",
+    "copyTemplateBiasPieced": "Quilt Binding Plan ({size}, Continuous Bias)\nBuy at shop: {buy} ({altBuyNote})\nCut: Sew {panels} widths of {wof} fabric together first, cut a {square} × {square} square, then make continuous {stripWidth} bias binding\nTotal binding: {totalBinding} | Exact fabric: {exactFabric} ({panels} × ({square} + {squaring} squaring))"
   },
   "diagram": {
     "heading": "Cutting Diagram",
@@ -119,28 +135,19 @@
   },
   "recommendations": {
     "heading": "Helpful Tools & Guides",
-    "disclosure": "More quilting tools and quick guides from Quilt Studio Tools",
+    "disclosure": "Quick references from Quilt Studio Tools",
     "items": [
       {
         "title": "Before-You-Cut Binding Checklist",
         "desc": "Three quick habits to avoid short strips, wavy edges, and bulky binding seams.",
         "cta": "Read tips",
-        "href": "#before-you-cut",
-        "comingSoon": false
+        "href": "#before-you-cut"
       },
       {
         "title": "Standard Quilt Binding Quick Chart",
         "desc": "At-a-glance strip counts and yardage for Baby, Throw, Twin, Queen, and King quilts.",
         "cta": "View chart",
-        "href": "#quick-chart",
-        "comingSoon": false
-      },
-      {
-        "title": "Quilt Backing Calculator",
-        "desc": "Calculate backing yardage with vertical or horizontal seams and longarm overhang.",
-        "cta": "Coming soon",
-        "href": "",
-        "comingSoon": true
+        "href": "#quick-chart"
       }
     ]
   },
@@ -157,7 +164,7 @@
         "heading": "Straight vs. Bias Binding: Which Should You Choose?",
         "paragraphs": [
           "Straight-of-grain binding is cut perpendicular to the selvedges across the width of fabric (WOF). It is faster to cut, uses less fabric, and is the best everyday choice for rectangular quilts with straight edges.",
-          "Bias binding is cut on the true 45° angle to the fabric grain. Because bias fabric stretches smoothly around curves and distributes wear across both warp and weft threads, choose bias binding for scalloped borders, circular quilts, or heirloom quilts that will be washed frequently."
+          "Continuous bias binding starts from a single fabric square cut diagonally at 45° and sewn into a tube so you can cut one long bias strip with minimal waste. Because bias fabric stretches smoothly around curves and distributes wear across both warp and weft threads, choose bias binding for scalloped borders, circular quilts, or heirloom quilts that will be washed frequently."
         ]
       }
     ],
@@ -185,7 +192,7 @@
       },
       {
         "q": "Why is a 2-inch squaring allowance included in the yardage?",
-        "a": "Fabric cut at the shop bolt is rarely perfectly on-grain. Adding 2\" (about 5 cm) lets you straighten the cut edge with your rotary cutter before slicing your first binding strip, without losing a full strip to a crooked cut."
+        "a": "Fabric cut at the shop bolt is rarely perfectly on-grain. Adding 2\" (about 5 cm) lets you straighten the cut edge with your rotary cutter before slicing your first binding strip or cutting your bias square, without coming up short."
       },
       {
         "q": "When do I actually need bias binding?",
@@ -196,8 +203,8 @@
         "a": "Yes, for small projects like wall hangings, table runners, or baby quilts. A standard fat quarter is roughly 18\" × 21\", which yields usable strips about 20\" wide after trimming selvedges. Enter 20\" as your Usable WOF in Advanced Options to calculate strips from fat quarters."
       },
       {
-        "q": "How is the bias binding starting square calculated?",
-        "a": "We multiply the total binding length by your strip width and by a 1.15 bias cutting allowance to cover angled end trimmings, then take the square root and round up to the next whole inch. That gives you a single square ready for the continuous bias binding method."
+        "q": "How is the continuous bias starting square and fabric yardage calculated?",
+        "a": "We multiply your total binding length by your strip width and by a 1.10 continuous-bias cutting allowance for diagonal seam joins, then take the square root and round up to the next whole inch for your starting square. Your shop yardage is then based on the full square side plus your squaring allowance (and automatically accounts for piecing multiple fabric widths if the square is wider than your usable WOF)."
       }
     ]
   },
@@ -210,9 +217,18 @@
     "footer": "Printed from Quilt Studio Tools — Quilt Binding Calculator"
   },
   "validation": {
-    "positiveNumber": "Please enter positive numbers greater than zero for quilt dimensions, strip width, and usable fabric width.",
+    "positiveNumber": "Please check the highlighted field above and enter a valid positive number.",
+    "widthPositive": "Enter a quilt width greater than 0.",
+    "lengthPositive": "Enter a quilt length greater than 0.",
+    "stripPositive": "Enter a strip width greater than 0 (e.g. 2 1/2 or 2.5).",
+    "wofPositive": "Enter a usable fabric width greater than 0.",
+    "nonNegative": "Enter 0 or a positive number.",
     "stripTooWide": "Strip width must be smaller than usable fabric width.",
-    "invalidSeam": "Seam allowance is too large for the usable fabric width. Please check Advanced Options."
+    "invalidSeam": "Seam allowance is too large for the usable fabric width.",
+    "wofTooSmallForBias": "Usable fabric width must be greater than ½\" to piece a bias square."
+  },
+  "warnings": {
+    "largeDimension": "Heads up: one of your quilt dimensions is over 150\" (381 cm). Double-check the number or unit if you meant a standard bed quilt."
   },
   "footer": {
     "copyright": "Quilt Studio Tools — Free quilting calculators.",

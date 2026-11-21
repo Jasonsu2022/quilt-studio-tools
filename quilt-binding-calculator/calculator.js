@@ -1,15 +1,16 @@
 /**
  * Quilt Binding Calculator — Pure Math Engine (Inches Internally)
- * Locked specification:
+ * v1.1 Specification:
  *  - TotalLength = 2 * (W + H) + Extra
- *  - Straight-of-Grain:
+ *  - Straight-of-Grain (unchanged):
  *      loss = (joinType === 'diagonal') ? S : (2 * seam)
  *      Strips = max(1, ceil(TotalLength / (WOF - loss) - 1e-9))
  *      FabricInches = Strips * S + Squaring
- *  - Bias:
- *      BiasArea = TotalLength * S * 1.15
+ *  - Bias (v1.1 Continuous Bias Square + piecing panels):
+ *      BiasArea = TotalLength * S * 1.10
  *      BiasSquareInches = ceil(sqrt(BiasArea))
- *      FabricInches = BiasArea / WOF + Squaring
+ *      panels = (BiasSquareInches <= WOF) ? 1 : ceil(BiasSquareInches / (WOF - 0.5) - 1e-9)
+ *      FabricInches = panels * (BiasSquareInches + Squaring)
  *  - Imperial Buy:
  *      Eighths = ceil(FabricInches / 4.5 - 1e-9)
  *      BuyYards = Eighths / 8 (formatted as reduced mixed fraction)
@@ -18,7 +19,8 @@
  */
 
 export const CM_PER_INCH = 2.54;
-export const BIAS_ALLOWANCE_FACTOR = 1.15;
+export const BIAS_ALLOWANCE_FACTOR = 1.10;
+export const LARGE_DIMENSION_WARNING_INCHES = 150;
 
 export const PRESETS = [
   { id: "baby", width: 36, length: 52 },
@@ -52,6 +54,41 @@ export function cmToInches(cm) {
   return cm / CM_PER_INCH;
 }
 
+/**
+ * Parse user numeric input, supporting standard decimals as well as
+ * mixed numbers and fractions such as "2 1/8", "100 1/2", "3/8", "2-1/4".
+ */
+export function parseFractionOrNumber(raw, allowFractions = true) {
+  if (typeof raw !== "string") return NaN;
+  const s = raw.trim().replace(",", ".");
+  if (s === "") return NaN;
+
+  if (allowFractions) {
+    // Mixed number: e.g. "2 1/8" or "100-1/2"
+    const mixedMatch = s.match(/^([+-]?\d+)\s*[-\s]\s*(\d+)\s*\/\s*(\d+)$/);
+    if (mixedMatch) {
+      const whole = Number(mixedMatch[1]);
+      const num = Number(mixedMatch[2]);
+      const den = Number(mixedMatch[3]);
+      if (den === 0) return NaN;
+      const sign = whole < 0 || s.startsWith("-") ? -1 : 1;
+      return sign * (Math.abs(whole) + num / den);
+    }
+
+    // Simple fraction: e.g. "3/8"
+    const fracMatch = s.match(/^([+-]?\d+)\s*\/\s*(\d+)$/);
+    if (fracMatch) {
+      const num = Number(fracMatch[1]);
+      const den = Number(fracMatch[2]);
+      if (den === 0) return NaN;
+      return num / den;
+    }
+  }
+
+  const num = Number(s);
+  return Number.isFinite(num) ? num : NaN;
+}
+
 function gcd(a, b) {
   let x = Math.abs(a);
   let y = Math.abs(b);
@@ -69,6 +106,7 @@ function gcd(a, b) {
  *   5 -> "5/8"
  *   8 -> "1"
  *  10 -> "1 1/4"
+ *  19 -> "2 3/8"
  */
 export function formatYardsFraction(eighths) {
   const whole = Math.floor(eighths / 8);
@@ -85,29 +123,28 @@ export function formatYardsFraction(eighths) {
   return `${whole} ${num}/${den}`;
 }
 
+const EIGHTH_GLYPHS = ["", "⅛", "¼", "⅜", "½", "⅝", "¾", "⅞"];
+
 /**
- * Format an inch measurement nicely for display:
- * Uses common quilting fractions (¼, ½, ¾) when exact within 1e-4,
- * otherwise up to 1 decimal place.
+ * Format an inch measurement using 1/8-inch quilting fractions (⅛, ¼, ⅜, ½, ⅝, ¾, ⅞).
+ * Example: 2.125 -> "2⅛", 2.625 -> "2⅝", 0.375 -> "⅜", 30 -> "30".
  */
 export function formatInchesDisplay(value) {
-  const rounded = Math.round(value * 100) / 100;
-  const whole = Math.floor(rounded + 1e-9);
-  const frac = rounded - whole;
+  if (!Number.isFinite(value)) return "—";
+  const sign = value < 0 ? "-" : "";
+  const abs = Math.abs(value);
+  const totalEighths = Math.round(abs * 8);
+  const whole = Math.floor(totalEighths / 8);
+  const rem = totalEighths % 8;
+  const glyph = EIGHTH_GLYPHS[rem];
 
-  if (Math.abs(frac) < 1e-3) {
-    return `${whole}`;
+  if (rem === 0) {
+    return `${sign}${whole}`;
   }
-  if (Math.abs(frac - 0.25) < 1e-3) {
-    return whole > 0 ? `${whole}¼` : `¼`;
+  if (whole === 0) {
+    return `${sign}${glyph}`;
   }
-  if (Math.abs(frac - 0.5) < 1e-3) {
-    return whole > 0 ? `${whole}½` : `½`;
-  }
-  if (Math.abs(frac - 0.75) < 1e-3) {
-    return whole > 0 ? `${whole}¾` : `¾`;
-  }
-  return `${Number(value.toFixed(1))}`;
+  return `${sign}${whole}${glyph}`;
 }
 
 export function formatCmDisplay(inches) {
@@ -125,9 +162,67 @@ export function formatInputFromInches(inches, inputUnit) {
     const cm = Math.round(inches * CM_PER_INCH * 10) / 10;
     return String(cm);
   }
-  // Keep clean precision for inches without floating noise
   const clean = Math.round(inches * 1000) / 1000;
   return String(clean);
+}
+
+/**
+ * Validate all fields and return a map of field-specific error keys.
+ */
+export function validateFields(params) {
+  const {
+    width,
+    length,
+    stripWidth,
+    wof,
+    extra,
+    squaring,
+    cutStyle,
+    joinType,
+    seam
+  } = params;
+
+  const isPos = (n) => typeof n === "number" && Number.isFinite(n) && n > 0;
+  const isNonNeg = (n) => typeof n === "number" && Number.isFinite(n) && n >= 0;
+
+  const fieldErrors = {};
+
+  if (!isPos(width)) fieldErrors.width = "widthPositive";
+  if (!isPos(length)) fieldErrors.length = "lengthPositive";
+  if (!isPos(stripWidth)) fieldErrors.stripWidth = "stripPositive";
+  if (!isPos(wof)) fieldErrors.wof = "wofPositive";
+  if (!isNonNeg(extra)) fieldErrors.extra = "nonNegative";
+  if (!isNonNeg(squaring)) fieldErrors.squaring = "nonNegative";
+
+  if (cutStyle === "straight" && joinType === "straight" && !isNonNeg(seam)) {
+    fieldErrors.seam = "nonNegative";
+  }
+
+  if (Object.keys(fieldErrors).length === 0) {
+    if (cutStyle === "straight") {
+      const loss = joinType === "diagonal" ? stripWidth : 2 * seam;
+      if (wof - loss <= 0) {
+        if (joinType === "diagonal") {
+          fieldErrors.stripWidth = "stripTooWide";
+        } else {
+          fieldErrors.seam = "invalidSeam";
+        }
+      }
+    } else {
+      if (stripWidth >= wof) {
+        fieldErrors.stripWidth = "stripTooWide";
+      } else {
+        const totalLength = 2 * (width + length) + extra;
+        const biasArea = totalLength * stripWidth * BIAS_ALLOWANCE_FACTOR;
+        const biasSquareInches = Math.ceil(Math.sqrt(biasArea));
+        if (biasSquareInches > wof && wof <= 0.5) {
+          fieldErrors.wof = "wofTooSmallForBias";
+        }
+      }
+    }
+  }
+
+  return fieldErrors;
 }
 
 /**
@@ -147,17 +242,14 @@ export function calculateBinding(params) {
     seam
   } = params;
 
-  const isFinitePos = (n) => typeof n === "number" && Number.isFinite(n) && n > 0;
-  const isFiniteNonNeg = (n) => typeof n === "number" && Number.isFinite(n) && n >= 0;
-
-  if (!isFinitePos(width) || !isFinitePos(length) || !isFinitePos(stripWidth) || !isFinitePos(wof)) {
-    return { valid: false, errorKey: "positiveNumber" };
-  }
-  if (!isFiniteNonNeg(extra) || !isFiniteNonNeg(squaring)) {
-    return { valid: false, errorKey: "positiveNumber" };
-  }
-  if (cutStyle === "straight" && joinType === "straight" && !isFiniteNonNeg(seam)) {
-    return { valid: false, errorKey: "invalidSeam" };
+  const fieldErrors = validateFields(params);
+  const errorKeys = Object.values(fieldErrors);
+  if (errorKeys.length > 0) {
+    return {
+      valid: false,
+      errorKey: errorKeys[0],
+      fieldErrors
+    };
   }
 
   const perimeter = 2 * (width + length);
@@ -166,13 +258,6 @@ export function calculateBinding(params) {
   if (cutStyle === "straight") {
     const loss = joinType === "diagonal" ? stripWidth : 2 * seam;
     const usableStripLength = wof - loss;
-    if (usableStripLength <= 0) {
-      return {
-        valid: false,
-        errorKey: joinType === "diagonal" ? "stripTooWide" : "invalidSeam"
-      };
-    }
-
     const strips = Math.max(1, Math.ceil(totalLength / usableStripLength - 1e-9));
     const stripsFabricInches = strips * stripWidth;
     const fabricInches = stripsFabricInches + squaring;
@@ -184,6 +269,7 @@ export function calculateBinding(params) {
 
     return {
       valid: true,
+      fieldErrors: {},
       cutStyle: "straight",
       perimeter,
       extra,
@@ -202,15 +288,16 @@ export function calculateBinding(params) {
     };
   }
 
-  // Bias mode
-  if (stripWidth >= wof) {
-    return { valid: false, errorKey: "stripTooWide" };
-  }
-
+  // Bias mode (v1.1 Continuous Bias Square + piecing panels)
   const biasArea = totalLength * stripWidth * BIAS_ALLOWANCE_FACTOR;
   const biasSquareInches = Math.ceil(Math.sqrt(biasArea));
-  const netFabricInches = biasArea / wof;
-  const fabricInches = netFabricInches + squaring;
+  const panels =
+    biasSquareInches <= wof
+      ? 1
+      : Math.ceil(biasSquareInches / (wof - 0.5) - 1e-9);
+  const netFabricInches = panels * biasSquareInches;
+  const squaringTotal = panels * squaring;
+  const fabricInches = panels * (biasSquareInches + squaring);
 
   const eighths = Math.ceil(fabricInches / 4.5 - 1e-9);
   const buyYards = eighths / 8;
@@ -219,14 +306,17 @@ export function calculateBinding(params) {
 
   return {
     valid: true,
+    fieldErrors: {},
     cutStyle: "bias",
     perimeter,
     extra,
     totalLength,
     biasArea,
     biasSquareInches,
+    panels,
     netFabricInches,
     squaring,
+    squaringTotal,
     fabricInches,
     eighths,
     buyYards,
