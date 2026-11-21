@@ -8,7 +8,7 @@ import {
   formatInchesDisplay,
   formatCmDisplay,
   formatInputFromInches
-} from "./calculator.js";
+} from "./calculator.js?v=1.3";
 
 const STORAGE_KEY = "qbk_state_v1";
 
@@ -787,7 +787,7 @@ function bindEvents() {
 
 async function init() {
   loadState();
-  const resp = await fetch("./en.json");
+  const resp = await fetch("./en.json?v=1.3");
   copy = await resp.json();
   syncAllInputsFromState();
   bindEvents();

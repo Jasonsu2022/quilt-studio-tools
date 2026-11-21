@@ -9,7 +9,7 @@ import {
   formatInchesDisplay,
   formatCmDisplay,
   formatInputFromInches
-} from "./calculator.js";
+} from "./calculator.js?v=1.3";
 
 const STORAGE_KEY = "qbc_state_v1";
 
@@ -1075,7 +1075,7 @@ function bindEvents() {
    ========================================================================== */
 
 async function init() {
-  const resp = await fetch("./en.json");
+  const resp = await fetch("./en.json?v=1.3");
   copy = await resp.json();
 
   loadState();
