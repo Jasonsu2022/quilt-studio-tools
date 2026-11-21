@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quilt Binding Calculator — Instant Strips, Yardage &amp; Cutting Diagram</title>
+  <meta name="description" content="Free quilt binding calculator for straight-of-grain and bias binding. Instantly find how many strips to cut, yardage or metres to buy at the fabric shop, and print a handy cutting card." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script defer src="../config/analytics.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <!-- Section 1: Minimal Top Bar + 3-Way Unit Switcher -->
+    <div class="top-header-wrap no-print">
+      <nav class="site-nav" aria-label="Site navigation">
+        <a class="site-brand" href="../" data-i18n="nav.siteName"></a>
+        <div class="site-nav-links">
+          <a href="../" data-i18n="nav.home"></a>
+          <a href="../about/" data-i18n="nav.about"></a>
+        </div>
+      </nav>
+
+      <div class="header-row">
+        <header class="page-header">
+          <h1 data-i18n="header.title"></h1>
+          <p class="page-subtitle" data-i18n="header.subtitle"></p>
+        </header>
+
+        <div class="unit-switcher" role="group" id="unitSwitcher">
+          <button type="button" class="unit-btn" data-unit="imperial" aria-pressed="true" data-i18n="units.imperial"></button>
+          <button type="button" class="unit-btn" data-unit="metric" aria-pressed="false" data-i18n="units.metric"></button>
+          <button type="button" class="unit-btn" data-unit="mixed" aria-pressed="false" data-i18n="units.mixed"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calculator Core: Input (Left) + Results & Diagram (Right) -->
+    <main class="core-grid no-print">
+      <!-- Section 2: Input Card -->
+      <section class="card" aria-label="Quilt binding inputs">
+        <!-- 2.1 Quilt Size Presets -->
+        <div class="field-group">
+          <div class="field-header">
+            <span class="field-label" data-i18n="presets.label"></span>
+            <span class="custom-badge" id="customPresetBadge" hidden data-i18n="presets.custom"></span>
+          </div>
+          <div class="preset-grid" id="presetGrid"></div>
+        </div>
+
+        <!-- 2.2 Width x Length -->
+        <div class="field-group">
+          <div class="dim-row">
+            <div>
+              <label class="field-label" for="inputWidth" data-i18n="inputs.width"></label>
+              <div class="input-wrap" style="margin-top: 8px;">
+                <input id="inputWidth" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
+                <span class="input-suffix" data-unit-suffix></span>
+              </div>
+            </div>
+            <div>
+              <label class="field-label" for="inputLength" data-i18n="inputs.length"></label>
+              <div class="input-wrap" style="margin-top: 8px;">
+                <input id="inputLength" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
+                <span class="input-suffix" data-unit-suffix></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2.3 Cut Style -->
+        <div class="field-group">
+          <span class="field-label" style="margin-bottom: 10px;" data-i18n="inputs.cutStyle.label"></span>
+          <div class="cut-style-grid" role="group">
+            <button type="button" class="cut-btn" data-cut-style="straight" aria-pressed="true">
+              <span class="cut-btn-title" data-i18n="inputs.cutStyle.straight"></span>
+              <span class="cut-btn-hint" data-i18n="inputs.cutStyle.straightHint"></span>
+            </button>
+            <button type="button" class="cut-btn" data-cut-style="bias" aria-pressed="false">
+              <span class="cut-btn-title" data-i18n="inputs.cutStyle.bias"></span>
+              <span class="cut-btn-hint" data-i18n="inputs.cutStyle.biasHint"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2.4 Strip Width -->
+        <div class="field-group">
+          <span class="field-label" style="margin-bottom: 10px;" data-i18n="inputs.stripWidth.label"></span>
+          <div class="strip-grid" id="stripGrid"></div>
+          <div class="custom-strip-drawer" id="customStripDrawer" hidden>
+            <label for="inputCustomStrip" data-i18n="inputs.stripWidth.customLabel"></label>
+            <div class="input-wrap">
+              <input id="inputCustomStrip" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
+              <span class="input-suffix" data-unit-suffix></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2.5 Advanced Options (Collapsed by default) -->
+        <div class="advanced-box">
+          <button type="button" class="advanced-toggle" id="advancedToggle" aria-expanded="false" aria-controls="advancedPanel">
+            <span class="advanced-toggle-text">
+              <span class="advanced-title" data-i18n="advanced.toggle"></span>
+              <span class="advanced-summary" id="advancedSummary"></span>
+            </span>
+            <span class="advanced-action-pill" id="advancedActionPill"></span>
+          </button>
+
+          <div class="advanced-panel" id="advancedPanel" hidden>
+            <div class="adv-field">
+              <label for="inputWof" data-i18n="advanced.wof"></label>
+              <div class="input-wrap">
+                <input id="inputWof" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
+                <span class="input-suffix" data-unit-suffix></span>
+              </div>
+              <p class="adv-hint" data-i18n="advanced.wofHint"></p>
+            </div>
+
+            <div class="adv-field">
+              <label for="inputExtra" data-i18n="advanced.extra"></label>
+              <div class="input-wrap">
+                <input id="inputExtra" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
+                <span class="input-suffix" data-unit-suffix></span>
+              </div>
+              <p class="adv-hint" data-i18n="advanced.extraHint"></p>
+            </div>
+
+            <div class="adv-field" id="joinMethodField">
+              <label data-i18n="advanced.joinType"></label>
+              <div class="join-row" role="group">
+                <button type="button" class="join-btn" data-join-type="diagonal" aria-pressed="true" data-i18n="advanced.diagonal"></button>
+                <button type="button" class="join-btn" data-join-type="straight" aria-pressed="false" data-i18n="advanced.straight"></button>
+              </div>
+              <div class="seam-drawer" id="seamDrawer" hidden>
+                <label for="inputSeam" data-i18n="advanced.seam"></label>
+                <div class="input-wrap">
+                  <input id="inputSeam" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
+                  <span class="input-suffix" data-unit-suffix></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="adv-field">
+              <label for="inputSquaring" data-i18n="advanced.squaring"></label>
+              <div class="input-wrap">
+                <input id="inputSquaring" class="num-input" type="text" inputmode="decimal" autocomplete="off" />
+                <span class="input-suffix" data-unit-suffix></span>
+              </div>
+              <p class="adv-hint" data-i18n="advanced.squaringHint"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Section 3 (Result Card) + Section 4 (SVG Diagram) -->
+      <div class="results-column">
+        <!-- Section 3: Result Card -->
+        <section class="result-card" aria-live="polite">
+          <div class="result-error" id="resultError" hidden></div>
+
+          <div class="result-valid" id="resultValid">
+            <div class="buy-hero">
+              <div class="buy-label" data-i18n="results.buyHeading"></div>
+              <div class="buy-value" id="buyValue"></div>
+              <div class="buy-sub" id="buySub"></div>
+            </div>
+
+            <div class="instruction-box" id="cuttingInstruction"></div>
+
+            <div class="breakdown-grid">
+              <div class="breakdown-cell">
+                <div class="breakdown-label" data-i18n="results.totalBinding"></div>
+                <div class="breakdown-value" id="bdTotalVal"></div>
+                <div class="breakdown-sub" id="bdTotalSub"></div>
+              </div>
+              <div class="breakdown-cell">
+                <div class="breakdown-label" data-i18n="results.exactFabric"></div>
+                <div class="breakdown-value" id="bdFabricVal"></div>
+                <div class="breakdown-sub" id="bdFabricSub"></div>
+              </div>
+              <div class="breakdown-cell">
+                <div class="breakdown-label" id="bdCountLabel"></div>
+                <div class="breakdown-value" id="bdCountVal"></div>
+                <div class="breakdown-sub" id="bdCountSub"></div>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button type="button" class="btn-print" id="btnPrint" data-i18n="actions.printCard"></button>
+              <button type="button" class="btn-copy" id="btnCopy" data-i18n="actions.copyPlan"></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 4: Dynamic SVG Cutting Diagram -->
+        <section class="card diagram-card" id="diagramCard">
+          <h2 data-i18n="diagram.heading"></h2>
+          <div class="diagram-stage" id="diagramStage"></div>
+          <p class="diagram-note" data-i18n="diagram.scaleNote"></p>
+        </section>
+      </div>
+    </main>
+
+    <!-- Below-the-Fold Content Sections (Single-column 760px on desktop) -->
+    <div class="content-sections no-print">
+      <!-- Section 5: 3 Before-You-Cut Tips -->
+      <section class="card" id="before-you-cut">
+        <h2 class="section-heading" data-i18n="tips.heading"></h2>
+        <ol class="tips-list" id="tipsList"></ol>
+      </section>
+
+      <!-- Section 6: Helpful Tools & Guides (v1 Internal Placeholders Only) -->
+      <section class="card" id="helpful-tools">
+        <h2 class="section-heading" data-i18n="recommendations.heading"></h2>
+        <p class="rec-disclosure" data-i18n="recommendations.disclosure"></p>
+        <div class="rec-grid" id="recGrid"></div>
+      </section>
+
+      <!-- Section 7: SEO Copy + Standard Quilt Quick Chart + FAQ -->
+      <section class="card" id="guide-section">
+        <div id="seoBlocks"></div>
+
+        <div class="chart-wrap" id="quick-chart">
+          <h2 data-i18n="seo.chartHeading"></h2>
+          <p class="chart-note" data-i18n="seo.chartNote"></p>
+          <div class="table-scroll">
+            <table class="quick-table" id="quickChartTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="faq-section">
+        <h2 class="section-heading" data-i18n="faq.heading"></h2>
+        <div class="faq-list" id="faqList"></div>
+      </section>
+
+      <footer class="site-footer">
+        <span data-i18n="footer.copyright"></span>
+        <a href="../about/" data-i18n="footer.aboutLink"></a>
+      </footer>
+    </div>
+
+    <!-- Dedicated Print Cutting Card (@media print only) -->
+    <section class="print-only-card" id="printCard" aria-hidden="true">
+      <div class="print-card-header">
+        <div class="print-card-title" id="printCardTitle"></div>
+      </div>
+
+      <div class="print-write-lines">
+        <div class="print-line-row">
+          <span id="printProjectLabel"></span>
+          <span class="print-line"></span>
+        </div>
+        <div class="print-line-row">
+          <span id="printDateLabel"></span>
+          <span class="print-line"></span>
+        </div>
+      </div>
+
+      <div class="print-meta-row" id="printMetaRow"></div>
+
+      <div class="print-buy-box">
+        <div class="print-buy-label" id="printBuyLabel"></div>
+        <div class="print-buy-value" id="printBuyValue"></div>
+        <div class="print-buy-sub" id="printBuySub"></div>
+      </div>
+
+      <div class="print-instruction" id="printInstruction"></div>
+
+      <div class="print-breakdown" id="printBreakdown"></div>
+
+      <div class="print-diagram-wrap" id="printDiagramWrap"></div>
+
+      <div class="print-footer" id="printFooter"></div>
+    </section>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
