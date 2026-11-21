@@ -9,6 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  PRESETS,
   FABRIC_WIDTH_PRESETS,
   DEFAULTS,
   calculateBacking,
@@ -42,7 +43,8 @@ const defBuyImperial = `${p.buyYardsLabel} ${p.buyYards > 1 ? copy.units.yards :
 const defAltMetric = `${p.buyMetresLabel} ${copy.units.m}`;
 const defBuySub = interpolate(copy.results.altBuyMetric, { altBuy: defAltMetric });
 const defRounding = interpolate(copy.results.roundingImperial, {
-  exact: `${p.exactYards.toFixed(2)} yd`
+  exact: `${formatInchesDisplay(p.exactInches)}"`,
+  allowance: `${formatInchesDisplay(p.cuttingAllowance)}"`
 });
 const seamWord = p.seams === 1 ? copy.results.seamSingular : copy.results.seamPlural;
 const panelWord = p.panels === 1 ? copy.results.panelSingular : copy.results.panelPlural;
@@ -110,6 +112,13 @@ function renderStaticSvg(res) {
 
   return `<svg viewBox="0 0 ${vbW} ${vbH}" width="100%" role="img" aria-label="${escapeHtml(altText)}" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;height:auto;display:block;margin:0 auto;font-family:'Plus Jakarta Sans',sans-serif;"><title>${escapeHtml(altText)}</title>${panelsSvg}<rect x="${qx.toFixed(1)}" y="${qy.toFixed(1)}" width="${qw.toFixed(1)}" height="${qh.toFixed(1)}" fill="rgba(255,255,255,0.45)" stroke="#241D18" stroke-width="1.6" stroke-dasharray="5 4" rx="2" /><text x="${(qx + qw / 2).toFixed(1)}" y="${(qy + qh / 2 - 4).toFixed(1)}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241D18">Quilt Top</text><text x="${(qx + qw / 2).toFixed(1)}" y="${(qy + qh / 2 + 12).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="#52473E">${formatInchesDisplay(q.width)}" × ${formatInchesDisplay(q.height)}"</text>${seamsSvg}<text x="${(ox + drawW / 2).toFixed(1)}" y="${(oy + drawH + 22).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#241D18">Backing Width: ${formatInchesDisplay(d.backingWidth)}"</text><text x="${(ox - 16).toFixed(1)}" y="${(oy + drawH / 2).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#241D18" transform="rotate(-90 ${(ox - 16).toFixed(1)} ${(oy + drawH / 2).toFixed(1)})">Length: ${formatInchesDisplay(d.backingLength)}"</text></svg>`;
 }
+
+const presetsHtml = PRESETS.map((pr) => {
+  return `            <button type="button" class="preset-btn" data-preset="${pr.id}" aria-pressed="false">
+              <span class="preset-name">${escapeHtml(copy.presets[pr.id])}</span>
+              <span class="preset-dim">${pr.width}×${pr.length}"</span>
+            </button>`;
+}).join("\n");
 
 const wofChipsHtml = [
   ...FABRIC_WIDTH_PRESETS.map((val) => {
@@ -207,6 +216,12 @@ const html = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${escapeHtml(copy.meta.title)}</title>
   <meta name="description" content="${escapeHtml(copy.meta.description)}" />
+  <meta property="og:title" content="${escapeHtml(copy.meta.title)}" />
+  <meta property="og:description" content="${escapeHtml(copy.meta.description)}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tools.3145201.xyz/quilt-backing-calculator/" />
+  <meta property="og:image" content="https://tools.3145201.xyz/og-cover.png" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://tools.3145201.xyz/quilt-backing-calculator/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -256,6 +271,16 @@ const html = `<!DOCTYPE html>
       <!-- Input Card -->
       <section class="card" aria-label="Quilt backing inputs">
         <div class="field-group">
+          <div class="field-header">
+            <span class="field-label">${escapeHtml(copy.presets.label)}</span>
+            <span class="custom-badge" id="customPresetBadge">${escapeHtml(copy.presets.custom)}</span>
+          </div>
+          <div class="preset-grid" id="presetGrid">
+${presetsHtml}
+          </div>
+        </div>
+
+        <div class="field-group">
           <span class="field-label" style="margin-bottom: 10px;">${escapeHtml(copy.inputs.dimensionsLabel)}</span>
           <div class="dim-row">
             <div>
@@ -283,15 +308,15 @@ const html = `<!DOCTYPE html>
           <div class="wof-grid" id="wofGrid">
 ${wofChipsHtml}
           </div>
-          <div class="inline-drawer">
+          <div class="inline-drawer" id="wofCustomDrawer" hidden>
             <label for="inputFabricWidth">${escapeHtml(copy.inputs.fabricWidth.inputLabel)}</label>
             <div class="input-wrap">
               <input id="inputFabricWidth" class="num-input" type="text" inputmode="decimal" autocomplete="off" value="${DEFAULTS.fabricWidth}" />
               <span class="input-suffix" data-unit-suffix>${escapeHtml(copy.units.in)}</span>
             </div>
             <p class="field-error-msg" id="errFabricWidth" hidden role="alert"></p>
-            <p class="adv-hint">${escapeHtml(copy.inputs.fabricWidth.hint)}</p>
           </div>
+          <p class="adv-hint">${escapeHtml(copy.inputs.fabricWidth.hint)}</p>
         </div>
 
         <div class="field-group">
@@ -376,6 +401,7 @@ ${wofChipsHtml}
               <div class="buy-value" id="buyValue">${escapeHtml(defBuyImperial)}</div>
               <div class="buy-sub" id="buySub">${escapeHtml(defBuySub)}</div>
               <div class="buy-rounding" id="buyRounding">${escapeHtml(defRounding)}</div>
+              <p class="buy-footnote">${escapeHtml(copy.results.roundingFootnote)}</p>
             </div>
 
             <div class="instruction-box" id="cuttingInstruction">${defInstruction}</div>
@@ -417,6 +443,7 @@ ${wofChipsHtml}
             <span class="legend-item"><span class="legend-swatch legend-swatch--seam"></span>${escapeHtml(copy.diagram.legendSeam)}</span>
           </div>
           <p class="diagram-note">${escapeHtml(copy.diagram.scaleNote)}</p>
+          <p class="diagram-note">${escapeHtml(copy.diagram.trimNote)}</p>
         </section>
 
         <!-- 3. Alternative Direction Comparison Card -->

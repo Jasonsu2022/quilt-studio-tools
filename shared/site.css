@@ -182,3 +182,31 @@ p {
   text-decoration: none;
   font-weight: 600;
 }
+
+@media (max-width: 480px) {
+  .wrap {
+    padding: 18px 14px 56px;
+  }
+
+  .top-nav {
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .brand {
+    font-size: 16px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .nav-links {
+    gap: 12px;
+    font-size: 13.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .nav-hide-sm {
+    display: none;
+  }
+}

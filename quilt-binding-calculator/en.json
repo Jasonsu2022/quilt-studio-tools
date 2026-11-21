@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Quilt Binding Calculator — Fabric Yardage, Strips & Cutting Diagram",
-    "description": "Free quilt binding calculator for straight-of-grain and continuous bias binding. Instantly find how many strips to cut, exact fabric yardage or metres to buy at the shop, and print a handy cutting card."
+    "description": "Free quilt binding calculator for straight-of-grain and continuous bias binding. Instantly find how many strips to cut, exact fabric yardage or meters to buy at the shop, and print a handy cutting card."
   },
   "nav": {
     "siteName": "Quilt Studio Tools",
@@ -78,6 +78,7 @@
     "altBuyImperial": "Or buy {altBuy} (imperial shop)",
     "roundingImperial": "Rounded up to the nearest 1/8 yard",
     "roundingMetric": "Rounded up to the nearest 0.05 m",
+    "roundingFootnote": "Yards round up to the nearest 1/8 yd and meters to the nearest 0.05 m, so the two figures are not exact conversions.",
     "includesSquaring": "includes {squaring} squaring",
     "instructionStraight": "Cut <strong>{strips} {stripWord}</strong>, each <strong>{stripWidth}</strong> wide across your <strong>{wof}</strong> usable fabric width.",
     "instructionBias": "Cut a <strong>{square} × {square} square</strong>, then make continuous <strong>{stripWidth}</strong> bias binding on the 45° diagonal.",
@@ -157,7 +158,7 @@
         "heading": "How to Calculate Quilt Binding",
         "paragraphs": [
           "To calculate quilt binding accurately, start by finding your quilt's perimeter: add the width and length, then multiply by two. Next, add 12 inches of extra length to give yourself comfortable room for four mitered corners and the final diagonal join where the two ends meet.",
-          "Divide that total binding length by your usable fabric width minus the seam loss for each strip join (one strip width for 45° diagonal joins, or twice the seam allowance for straight seams), and round up to a whole number of strips. Finally, multiply the strip count by your strip width, add 2 inches for squaring up the fabric edge, and round up to the nearest 1/8 yard (or 0.05 metre)."
+          "Divide that total binding length by your usable fabric width minus the seam loss for each strip join (one strip width for 45° diagonal joins, or twice the seam allowance for straight seams), and round up to a whole number of strips. Finally, multiply the strip count by your strip width, add 2 inches for squaring up the fabric edge, and round up to the nearest 1/8 yard (or 0.05 meter)."
         ]
       },
       {

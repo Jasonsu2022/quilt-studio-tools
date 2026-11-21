@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Quilt Backing & Batting Calculator — Fabric Yardage, Panels & Layout Diagram",
-    "description": "Free quilt backing and batting calculator. Find exact fabric yardage or metres for 42\", 44\", 54\", or 108\" wideback, compare vertical vs. horizontal piecing with 1/2\" seams, view a live layout diagram, and match standard batting packages."
+    "description": "Free quilt backing and batting calculator. Find exact fabric yardage or meters for 42\", 44\", 54\", or 108\" wideback, compare vertical vs. horizontal piecing with 1/2\" seams, view a live layout diagram, and match standard batting packages."
   },
   "nav": {
     "siteName": "Quilt Studio Tools",
@@ -27,6 +27,15 @@
     "yard": "yard",
     "yards": "yards",
     "m": "m"
+  },
+  "presets": {
+    "label": "Quilt Size",
+    "custom": "Custom",
+    "baby": "Baby",
+    "throw": "Throw",
+    "twin": "Twin",
+    "queen": "Queen",
+    "king": "King"
   },
   "inputs": {
     "dimensionsLabel": "Quilt Top Dimensions",
@@ -71,12 +80,14 @@
     "buyHeading": "Backing Fabric to Buy",
     "altBuyMetric": "Or buy {altBuy} (metric shop)",
     "altBuyImperial": "Or buy {altBuy} (imperial shop)",
-    "roundingImperial": "Rounded up to nearest 1/8 yard · {exact} exact",
-    "roundingMetric": "Rounded up to nearest 0.05 m · {exact} exact",
+    "roundingImperial": "Rounded up to nearest 1/8 yard · {exact} + {allowance} cutting allowance",
+    "roundingMetric": "Rounded up to nearest 0.05 m · {exact} + {allowance} cutting allowance",
+    "roundingFootnote": "Yards round up to the nearest 1/8 yd and meters to the nearest 0.05 m, so the two figures are not exact conversions.",
     "orientationSingle": "Single Panel (No Seams)",
     "orientationVertical": "Vertical Seams (Lengthwise)",
     "orientationHorizontal": "Horizontal Seams (Crosswise)",
-    "instructionSingle": "Buy {buy} and cut <strong>1 piece</strong> at <strong>{cutLength}</strong> long (no piecing needed).",
+    "instructionSingle": "Buy {buy} and cut <strong>1 piece</strong> at <strong>{cutLength}</strong> long — the {usable} usable width covers the {coveredSide} width of your backing (no piecing needed).",
+    "instructionSingleRotated": "Buy {buy} and cut <strong>1 piece</strong> at <strong>{cutLength}</strong> long and rotate it 90° — the {usable} usable width covers the {coveredSide} side of your backing (no piecing needed).",
     "instructionPieced": "Cut <strong>{panels} panels</strong> of <strong>{cutLength}</strong> each; sew with {seams} {seamWord} (1/2\" seam allowance).",
     "panelSingular": "panel",
     "panelPlural": "panels",
@@ -89,6 +100,9 @@
     "backingSizeLabel": "Backing Size",
     "altCard": {
       "heading": "Alternative Seam Direction",
+      "singleHeading": "Other Cutting Direction",
+      "singleName": "Other cutting direction",
+      "singleSummary": "1 piece × {cutLength} (no seams) — {buy}",
       "verticalName": "Vertical Seams",
       "horizontalName": "Horizontal Seams",
       "summary": "{panels} {panelWord} × {cutLength} ({seams} {seamWord}) — {buy}",
@@ -111,6 +125,7 @@
   "diagram": {
     "heading": "Backing Layout & Piecing Diagram",
     "scaleNote": "Proportional layout showing usable panels, 1/2\" seam lines, and centered quilt top with overage.",
+    "trimNote": "Panels are drawn at full usable width — trim the pieced backing to the final size above.",
     "legendBacking": "Backing panel",
     "legendQuiltTop": "Quilt top",
     "legendSeam": "1/2\" seam",
@@ -122,7 +137,7 @@
     "copied": "Copied!"
   },
   "stickyBar": {
-    "viewDetails": "View Plan"
+    "viewDetails": "Details"
   },
   "completeProject": {
     "heading": "Complete Your Project",

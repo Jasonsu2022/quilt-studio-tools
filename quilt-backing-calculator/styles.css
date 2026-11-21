@@ -90,7 +90,7 @@ input {
   width: 100%;
   max-width: 640px;
   margin: 0 auto;
-  padding: 16px 16px 56px;
+  padding: 16px 16px calc(92px + env(safe-area-inset-bottom, 0px));
 }
 
 .core-grid {
@@ -182,6 +182,32 @@ input {
 .site-nav-links a:hover {
   color: var(--accent-green);
   text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .site-nav {
+    gap: 6px;
+    font-size: 13px;
+    flex-wrap: nowrap;
+  }
+
+  .site-brand {
+    font-size: 13.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .site-nav-links {
+    gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .site-nav-links a {
+    padding: 0 2px;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
 }
 
 .page-header {
@@ -808,6 +834,13 @@ a:focus-visible {
   font-size: 14px;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+.buy-footnote {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
 }
 
 .instruction-box {
@@ -1511,6 +1544,10 @@ a:focus-visible {
   border: 1px solid var(--border-card);
 }
 
+.inline-drawer[hidden] {
+  display: none;
+}
+
 .inline-drawer label {
   display: block;
   font-size: 0.92rem;
@@ -1553,21 +1590,33 @@ a:focus-visible {
 .switch-input {
   position: relative;
   width: 52px;
-  height: 30px;
+  height: 44px;
   flex-shrink: 0;
   appearance: none;
   -webkit-appearance: none;
-  background: #C4B5A0;
+  background: transparent;
+  border: none;
   border-radius: 999px;
   outline: none;
   cursor: pointer;
+}
+
+.switch-input::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 0;
+  width: 52px;
+  height: 30px;
+  border-radius: 999px;
+  background: #C4B5A0;
   transition: background 0.18s ease;
 }
 
 .switch-input::after {
   content: "";
   position: absolute;
-  top: 3px;
+  top: 10px;
   left: 3px;
   width: 24px;
   height: 24px;
@@ -1577,7 +1626,7 @@ a:focus-visible {
   transition: transform 0.18s ease;
 }
 
-.switch-input:checked {
+.switch-input:checked::before {
   background: var(--accent-green);
 }
 

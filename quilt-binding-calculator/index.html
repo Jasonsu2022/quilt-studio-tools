@@ -4,14 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Quilt Binding Calculator — Fabric Yardage, Strips &amp; Cutting Diagram</title>
-  <meta name="description" content="Free quilt binding calculator for straight-of-grain and continuous bias binding. Instantly find how many strips to cut, exact fabric yardage or metres to buy at the shop, and print a handy cutting card." />
+  <meta name="description" content="Free quilt binding calculator for straight-of-grain and continuous bias binding. Instantly find how many strips to cut, exact fabric yardage or meters to buy at the shop, and print a handy cutting card." />
+  <meta property="og:title" content="Quilt Binding Calculator — Fabric Yardage, Strips &amp; Cutting Diagram" />
+  <meta property="og:description" content="Free quilt binding calculator for straight-of-grain and continuous bias binding. Instantly find how many strips to cut, exact fabric yardage or meters to buy at the shop, and print a handy cutting card." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tools.3145201.xyz/quilt-binding-calculator/" />
+  <meta property="og:image" content="https://tools.3145201.xyz/og-cover.png" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://tools.3145201.xyz/quilt-binding-calculator/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
   <script id="faq-jsonld" type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Should I use 2¼\" or 2½\" binding strips?","acceptedAnswer":{"@type":"Answer","text":"Both make double-fold (French fold) binding. 2½\" is the most common choice because it wraps easily around medium-loft batting and gives a slightly wider margin for machine or hand stitching on the back. Choose 2¼\" if you prefer a tighter, crisper finish with thin cotton batting."}},{"@type":"Question","name":"Why does the calculator add 12 inches of extra length?","acceptedAnswer":{"@type":"Answer","text":"Turning four neat 90° mitered corners and overlapping the beginning and ending tails for a hidden diagonal join takes extra binding length. Adding 12\" (about 30 cm) ensures you will never come up a few inches short on the final seam."}},{"@type":"Question","name":"Why is a 2-inch squaring allowance included in the yardage?","acceptedAnswer":{"@type":"Answer","text":"Fabric cut at the shop bolt is rarely perfectly on-grain. Adding 2\" (about 5 cm) lets you straighten the cut edge with your rotary cutter before slicing your first binding strip or cutting your bias square, without coming up short."}},{"@type":"Question","name":"When do I actually need bias binding?","acceptedAnswer":{"@type":"Answer","text":"You need bias binding whenever your quilt has curved or scalloped edges so the binding can ease around bends without puckering. Some quilters also prefer bias binding on heavily used bed quilts because the diagonal weave resists edge wear longer."}},{"@type":"Question","name":"Can I make quilt binding from a Fat Quarter?","acceptedAnswer":{"@type":"Answer","text":"Yes, for small projects like wall hangings, table runners, or baby quilts. A standard fat quarter is roughly 18\" × 21\", which yields usable strips about 20\" wide after trimming selvedges. Enter 20\" as your Usable WOF in Advanced Options to calculate strips from fat quarters."}},{"@type":"Question","name":"How is the continuous bias starting square and fabric yardage calculated?","acceptedAnswer":{"@type":"Answer","text":"We multiply your total binding length by your strip width and by a 1.10 continuous-bias cutting allowance for diagonal seam joins, then take the square root and round up to the next whole inch for your starting square. Your shop yardage is then based on the full square side plus your squaring allowance (and automatically accounts for piecing multiple fabric widths if the square is wider than your usable WOF)."}}]}</script>
-  <script id="app-jsonld" type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Quilt Binding Calculator","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","url":"https://tools.3145201.xyz/quilt-binding-calculator/","description":"Free quilt binding calculator for straight-of-grain and continuous bias binding. Instantly find how many strips to cut, exact fabric yardage or metres to buy at the shop, and print a handy cutting card.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+  <script id="app-jsonld" type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Quilt Binding Calculator","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","url":"https://tools.3145201.xyz/quilt-binding-calculator/","description":"Free quilt binding calculator for straight-of-grain and continuous bias binding. Instantly find how many strips to cut, exact fabric yardage or meters to buy at the shop, and print a handy cutting card.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
   <script id="breadcrumb-jsonld" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://tools.3145201.xyz/"},{"@type":"ListItem","position":2,"name":"Quilt Binding Calculator","item":"https://tools.3145201.xyz/quilt-binding-calculator/"}]}</script>
   <script defer src="../config/analytics.js"></script>
 </head>
@@ -226,6 +232,7 @@
               <div class="buy-value" id="buyValue">5/8 yard</div>
               <div class="buy-sub" id="buySub">Or buy 0.50 m (metric shop) · includes 2&quot; squaring</div>
               <div class="buy-rounding" id="buyRounding">Rounded up to the nearest 1/8 yard</div>
+              <p class="buy-footnote" data-i18n="results.roundingFootnote">Yards round up to the nearest 1/8 yd and meters to the nearest 0.05 m, so the two figures are not exact conversions.</p>
             </div>
 
             <div class="instruction-box" id="cuttingInstruction">Cut <strong>7 strips</strong>, each <strong>2½"</strong> wide across your <strong>42"</strong> usable fabric width.</div>
@@ -322,7 +329,7 @@
         <div class="seo-block">
           <h2>How to Calculate Quilt Binding</h2>
           <p>To calculate quilt binding accurately, start by finding your quilt's perimeter: add the width and length, then multiply by two. Next, add 12 inches of extra length to give yourself comfortable room for four mitered corners and the final diagonal join where the two ends meet.</p>
-          <p>Divide that total binding length by your usable fabric width minus the seam loss for each strip join (one strip width for 45° diagonal joins, or twice the seam allowance for straight seams), and round up to a whole number of strips. Finally, multiply the strip count by your strip width, add 2 inches for squaring up the fabric edge, and round up to the nearest 1/8 yard (or 0.05 metre).</p>
+          <p>Divide that total binding length by your usable fabric width minus the seam loss for each strip join (one strip width for 45° diagonal joins, or twice the seam allowance for straight seams), and round up to a whole number of strips. Finally, multiply the strip count by your strip width, add 2 inches for squaring up the fabric edge, and round up to the nearest 1/8 yard (or 0.05 meter).</p>
         </div>
         <div class="seo-block">
           <h2>Straight vs. Bias Binding: Which Should You Choose?</h2>

@@ -1,4 +1,5 @@
 import {
+  PRESETS,
   FABRIC_WIDTH_PRESETS,
   DEFAULTS,
   calculateBacking,
@@ -12,7 +13,7 @@ import {
 const STORAGE_KEY = "qbk_state_v1";
 
 let copy = null;
-let state = { ...DEFAULTS };
+let state = { ...DEFAULTS, isCustomFabricWidth: false };
 let rawInputs = {
   width: null,
   length: null,
@@ -87,10 +88,16 @@ function loadState() {
     if (!raw) return;
     const parsed = JSON.parse(raw);
     if (parsed && typeof parsed === "object") {
-      state = { ...DEFAULTS, ...parsed };
+      state = { ...DEFAULTS, isCustomFabricWidth: false, ...parsed };
+      const matchesPreset = FABRIC_WIDTH_PRESETS.some(
+        (v) => Math.abs(v - state.fabricWidth) < 1e-6
+      );
+      if (!matchesPreset) {
+        state.isCustomFabricWidth = true;
+      }
     }
   } catch {
-    state = { ...DEFAULTS };
+    state = { ...DEFAULTS, isCustomFabricWidth: false };
   }
 }
 
@@ -121,16 +128,71 @@ function renderUnitButtons() {
   });
 }
 
+function getMatchingPresetId() {
+  if (!Number.isFinite(state.width) || !Number.isFinite(state.length)) return null;
+  for (const p of PRESETS) {
+    if (Math.abs(state.width - p.width) < 1e-4 && Math.abs(state.length - p.length) < 1e-4) {
+      return p.id;
+    }
+  }
+  return null;
+}
+
+function renderPresets() {
+  const grid = document.getElementById("presetGrid");
+  if (!grid || !copy) return;
+  const activeId = getMatchingPresetId();
+  const unit = getInputUnit();
+
+  const badge = document.getElementById("customPresetBadge");
+  if (badge) badge.hidden = activeId !== null;
+
+  grid.innerHTML = PRESETS.map((p) => {
+    const label = copy.presets[p.id];
+    const dim =
+      unit === "cm"
+        ? `${Math.round(p.width * 2.54)}×${Math.round(p.length * 2.54)} cm`
+        : `${p.width}×${p.length}"`;
+    const active = p.id === activeId;
+    return `
+      <button type="button" class="preset-btn" data-preset="${p.id}" aria-pressed="${active}">
+        <span class="preset-name">${escapeHtml(label)}</span>
+        <span class="preset-dim">${escapeHtml(dim)}</span>
+      </button>
+    `;
+  }).join("");
+
+  grid.querySelectorAll(".preset-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const preset = PRESETS.find((p) => p.id === btn.dataset.preset);
+      if (!preset) return;
+      state.width = preset.width;
+      state.length = preset.length;
+      rawInputs.width = null;
+      rawInputs.length = null;
+      syncAllInputsFromState();
+      recalculate();
+    });
+  });
+}
+
 function renderFabricWidthButtons() {
-  const isPreset = FABRIC_WIDTH_PRESETS.some(
+  const matchesPreset = FABRIC_WIDTH_PRESETS.some(
     (v) => Math.abs(v - state.fabricWidth) < 1e-6
   );
+  const showCustom = Boolean(state.isCustomFabricWidth || !matchesPreset);
   document.querySelectorAll("[data-wof]").forEach((btn) => {
     const val = btn.dataset.wof;
     const pressed =
-      val === "custom" ? !isPreset : Math.abs(Number(val) - state.fabricWidth) < 1e-6;
+      val === "custom"
+        ? showCustom
+        : !showCustom && Math.abs(Number(val) - state.fabricWidth) < 1e-6;
     btn.setAttribute("aria-pressed", String(pressed));
   });
+  const drawer = document.getElementById("wofCustomDrawer");
+  if (drawer) {
+    drawer.hidden = !showCustom;
+  }
 }
 
 function renderOverageButtons() {
@@ -172,6 +234,7 @@ function syncAllInputsFromState() {
   if (dirEl) dirEl.checked = Boolean(state.isDirectional);
 
   renderUnitButtons();
+  renderPresets();
   renderFabricWidthButtons();
   renderOverageButtons();
   renderAdvancedSummary();
@@ -209,18 +272,27 @@ export function buildBackingSvgString(res, copyObj, inputUnit) {
       const py = oy + p.y * scale;
       const pw = p.drawWidth * scale;
       const ph = p.drawHeight * scale;
-      const label =
-        d.panels.length > 1
-          ? `P${p.index} (${fmt(p.cutWidth)})`
-          : `${fmt(p.cutWidth)} usable`;
+      const rectSvg = `<rect x="${px.toFixed(1)}" y="${py.toFixed(1)}" width="${pw.toFixed(1)}" height="${ph.toFixed(1)}" fill="#E8F0EC" stroke="#2B5447" stroke-width="1.5" />`;
+      if (d.panels.length === 1) {
+        const label = `${fmt(p.cutWidth)} usable width`;
+        const labelX = ox + drawW / 2;
+        const labelY = Math.max(16, oy - 10);
+        return (
+          rectSvg +
+          `<text x="${labelX.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="#2B5447">${escapeHtml(label)}</text>`
+        );
+      }
+      const label = `P${p.index} (${fmt(p.cutWidth)})`;
       const showLabel = pw > 52 && ph > 24;
       const labelX = px + pw / 2;
       const labelY =
         d.orientation === "vertical" ? py + 16 : py + ph / 2 + 4;
-      return `<rect x="${px.toFixed(1)}" y="${py.toFixed(1)}" width="${pw.toFixed(1)}" height="${ph.toFixed(1)}" fill="#E8F0EC" stroke="#2B5447" stroke-width="1.5" />` +
+      return (
+        rectSvg +
         (showLabel
           ? `<text x="${labelX.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#2B5447">${escapeHtml(label)}</text>`
-          : "");
+          : "")
+      );
     })
     .join("");
 
@@ -296,8 +368,8 @@ function renderResults(res) {
   const p = res.primary;
   const buyText = formatPrimaryBuy(p);
   const altText = formatAltBuy(p);
-  const exactYdsStr = `${p.exactYards.toFixed(2)} yd`;
-  const exactMStr = `${(p.exactInches * 0.0254).toFixed(2)} m`;
+  const exactMeasureStr = formatMeasure(p.exactInches);
+  const allowanceStr = formatMeasure(p.cuttingAllowance);
 
   const orientEl = document.getElementById("orientationPill");
   if (orientEl) {
@@ -316,16 +388,29 @@ function renderResults(res) {
       : interpolate(copy.results.altBuyImperial, { altBuy: altText });
   document.getElementById("buyRounding").textContent =
     getBuyUnit() === "yd"
-      ? interpolate(copy.results.roundingImperial, { exact: exactYdsStr })
-      : interpolate(copy.results.roundingMetric, { exact: exactMStr });
+      ? interpolate(copy.results.roundingImperial, {
+          exact: exactMeasureStr,
+          allowance: allowanceStr
+        })
+      : interpolate(copy.results.roundingMetric, {
+          exact: exactMeasureStr,
+          allowance: allowanceStr
+        });
 
   const seamWord =
     p.seams === 1 ? copy.results.seamSingular : copy.results.seamPlural;
   const instrEl = document.getElementById("cuttingInstruction");
   if (p.panels === 1) {
-    instrEl.innerHTML = interpolate(copy.results.instructionSingle, {
+    const isRotated = res.chosenOrientation === "horizontal";
+    const coveredSide = isRotated ? res.backingLength : res.backingWidth;
+    const template = isRotated
+      ? copy.results.instructionSingleRotated
+      : copy.results.instructionSingle;
+    instrEl.innerHTML = interpolate(template, {
       buy: escapeHtml(buyText),
-      cutLength: escapeHtml(formatMeasure(p.cutLength))
+      cutLength: escapeHtml(formatMeasure(p.cutLength)),
+      usable: escapeHtml(formatMeasure(res.usableWof)),
+      coveredSide: escapeHtml(formatMeasure(coveredSide))
     });
   } else {
     instrEl.innerHTML = interpolate(copy.results.instructionPieced, {
@@ -361,28 +446,40 @@ function renderResults(res) {
     altTitle.textContent = copy.results.altCard.directionalTitle;
     altBody.innerHTML = `<p class="batting-note">${escapeHtml(copy.results.altCard.directionalBody)}</p>`;
   } else {
-    altTitle.textContent = copy.results.altCard.heading;
     const alt = res.alternative;
-    const altDirName =
-      res.alternativeOrientation === "vertical"
-        ? copy.results.altCard.verticalName
-        : copy.results.altCard.horizontalName;
-    const altPanelWord =
-      alt.panels === 1 ? copy.results.panelSingular : copy.results.panelPlural;
-    const altSeamWord =
-      alt.seams === 1 ? copy.results.seamSingular : copy.results.seamPlural;
-    altBody.innerHTML = `<div class="alt-compare-row">
-      <span><strong>${escapeHtml(altDirName)}:</strong> ${escapeHtml(
-        interpolate(copy.results.altCard.summary, {
-          panels: alt.panels,
-          panelWord: altPanelWord,
-          cutLength: formatMeasure(alt.cutLength),
-          seams: alt.seams,
-          seamWord: altSeamWord,
-          buy: formatPrimaryBuy(alt)
-        })
-      )}</span>
-    </div>`;
+    if (alt.panels === 1) {
+      altTitle.textContent = copy.results.altCard.singleHeading;
+      altBody.innerHTML = `<div class="alt-compare-row">
+        <span><strong>${escapeHtml(copy.results.altCard.singleName)}:</strong> ${escapeHtml(
+          interpolate(copy.results.altCard.singleSummary, {
+            cutLength: formatMeasure(alt.cutLength),
+            buy: formatPrimaryBuy(alt)
+          })
+        )}</span>
+      </div>`;
+    } else {
+      altTitle.textContent = copy.results.altCard.heading;
+      const altDirName =
+        res.alternativeOrientation === "vertical"
+          ? copy.results.altCard.verticalName
+          : copy.results.altCard.horizontalName;
+      const altPanelWord =
+        alt.panels === 1 ? copy.results.panelSingular : copy.results.panelPlural;
+      const altSeamWord =
+        alt.seams === 1 ? copy.results.seamSingular : copy.results.seamPlural;
+      altBody.innerHTML = `<div class="alt-compare-row">
+        <span><strong>${escapeHtml(altDirName)}:</strong> ${escapeHtml(
+          interpolate(copy.results.altCard.summary, {
+            panels: alt.panels,
+            panelWord: altPanelWord,
+            cutLength: formatMeasure(alt.cutLength),
+            seams: alt.seams,
+            seamWord: altSeamWord,
+            buy: formatPrimaryBuy(alt)
+          })
+        )}</span>
+      </div>`;
+    }
   }
 
   // 4. Wideback / Multi-panel Banner
@@ -452,10 +549,13 @@ function updatePrintCard(res, buyText, altText, panelWord, seamWord) {
     `${copy.printCard.quiltSpecLabel} ${formatMeasure(state.width)} × ${formatMeasure(state.length)}   ·   ${copy.printCard.fabricSpecLabel} ${formatMeasure(state.fabricWidth)} WOF (${formatMeasure(res.usableWof)} usable)`;
   document.getElementById("printBuyLabel").textContent = copy.results.buyHeading;
   document.getElementById("printBuyValue").textContent = buyText;
-  document.getElementById("printBuySub").textContent = `(${altText}) · Backing ${formatMeasure(res.backingWidth)} × ${formatMeasure(res.backingLength)}`;
+  document.getElementById("printBuySub").textContent =
+    `(${altText}) · ${formatMeasure(p.exactInches)} + ${formatMeasure(p.cuttingAllowance)} cutting allowance · Backing ${formatMeasure(res.backingWidth)} × ${formatMeasure(res.backingLength)}`;
   document.getElementById("printInstruction").textContent =
     p.panels === 1
-      ? `Cut 1 piece at ${formatMeasure(p.cutLength)} long (no seams).`
+      ? res.chosenOrientation === "horizontal"
+        ? `Cut 1 piece at ${formatMeasure(p.cutLength)} long and rotate 90° — ${formatMeasure(res.usableWof)} usable width covers ${formatMeasure(res.backingLength)} side (no seams).`
+        : `Cut 1 piece at ${formatMeasure(p.cutLength)} long — ${formatMeasure(res.usableWof)} usable width covers ${formatMeasure(res.backingWidth)} width (no seams).`
       : `Cut ${p.panels} ${panelWord} at ${formatMeasure(p.cutLength)} each; sew ${p.seams} ${seamWord} (1/2" seam allowance).`;
   const bat = res.batting;
   const batText = bat.exceedKing
@@ -507,6 +607,7 @@ function recalculate() {
     state.overage = ov;
     state.selvageDeduction = sel;
     saveState();
+    renderPresets();
     renderFabricWidthButtons();
     renderOverageButtons();
     renderAdvancedSummary();
@@ -560,9 +661,13 @@ function bindEvents() {
     btn.addEventListener("click", () => {
       const val = btn.dataset.wof;
       if (val === "custom") {
+        state.isCustomFabricWidth = true;
+        saveState();
+        renderFabricWidthButtons();
         const wofEl = document.getElementById("inputFabricWidth");
         if (wofEl) wofEl.focus();
       } else {
+        state.isCustomFabricWidth = false;
         state.fabricWidth = Number(val);
         rawInputs.fabricWidth = null;
         document.getElementById("inputFabricWidth").value =
@@ -620,7 +725,7 @@ function bindEvents() {
   const btnReset = document.getElementById("btnReset");
   if (btnReset) {
     btnReset.addEventListener("click", () => {
-      state = { ...DEFAULTS, unitMode: state.unitMode };
+      state = { ...DEFAULTS, isCustomFabricWidth: false, unitMode: state.unitMode };
       rawInputs = {
         width: null,
         length: null,

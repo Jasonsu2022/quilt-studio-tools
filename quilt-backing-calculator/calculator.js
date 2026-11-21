@@ -10,14 +10,24 @@
  *      else      -> N = ceil((S - 1) / (U - 1) - 1e-9)
  *      seams = N - 1
  *  - Exact fabric inches: exactInches = N * C
- *  - Imperial buy: ceil((exactInches / 36) * 8 - 1e-9) / 8 (nearest 1/8 yd)
- *  - Metric buy (corrected): ceil((exactInches * 0.0254) / 0.05 - 1e-9) * 0.05 (nearest 0.05 m)
+ *  - Buy inches: buyInches = exactInches + 2" (cutting allowance)
+ *  - Imperial buy: ceil(buyInches / 4.5 - 1e-9) / 8 (nearest 1/8 yd)
+ *  - Metric buy: ceil((buyInches * 0.0254) / 0.05 - 1e-9) * 0.05 (nearest 0.05 m)
  */
 
 export const CM_PER_INCH = 2.54;
 export const SEAM_ALLOWANCE_PER_EDGE = 0.5;
 export const SEAM_NET_LOSS = 1.0;
+export const CUTTING_ALLOWANCE = 2;
 export const LARGE_DIMENSION_WARNING_INCHES = 150;
+
+export const PRESETS = [
+  { id: "baby", width: 36, length: 52 },
+  { id: "throw", width: 50, length: 65 },
+  { id: "twin", width: 70, length: 90 },
+  { id: "queen", width: 90, length: 108 },
+  { id: "king", width: 108, length: 108 }
+];
 
 export const FABRIC_WIDTH_PRESETS = [42, 44, 54, 108];
 
@@ -146,11 +156,12 @@ function calcOrientation(span, cutLength, usableWof) {
   const seams = panels - 1;
   const exactInches = panels * cutLength;
   const exactYards = exactInches / 36;
-  const eighths = Math.ceil(exactYards * 8 - 1e-9);
+  const buyInches = exactInches + CUTTING_ALLOWANCE;
+  const eighths = Math.ceil(buyInches / 4.5 - 1e-9);
   const buyYards = eighths / 8;
   const buyYardsLabel = formatYardsFraction(eighths);
   const buyMetres =
-    Math.ceil((exactInches * CM_PER_INCH) / 5 - 1e-9) * 0.05;
+    Math.ceil((buyInches * 0.0254) / 0.05 - 1e-9) * 0.05;
   const buyMetresLabel = buyMetres.toFixed(2);
 
   return {
@@ -158,6 +169,8 @@ function calcOrientation(span, cutLength, usableWof) {
     seams,
     cutLength,
     exactInches,
+    cuttingAllowance: CUTTING_ALLOWANCE,
+    buyInches,
     exactYards,
     eighths,
     buyYards,

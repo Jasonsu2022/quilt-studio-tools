@@ -199,6 +199,12 @@ const html = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${escapeHtml(copy.meta.title)}</title>
   <meta name="description" content="${escapeHtml(copy.meta.description)}" />
+  <meta property="og:title" content="${escapeHtml(copy.meta.title)}" />
+  <meta property="og:description" content="${escapeHtml(copy.meta.description)}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tools.3145201.xyz/quilt-binding-calculator/" />
+  <meta property="og:image" content="https://tools.3145201.xyz/og-cover.png" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://tools.3145201.xyz/quilt-binding-calculator/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -389,6 +395,7 @@ ${stripsHtml}
               <div class="buy-value" id="buyValue">${escapeHtml(defBuyImperial)}</div>
               <div class="buy-sub" id="buySub">${escapeHtml(defBuySub)}</div>
               <div class="buy-rounding" id="buyRounding">${escapeHtml(copy.results.roundingImperial)}</div>
+              <p class="buy-footnote" data-i18n="results.roundingFootnote">${escapeHtml(copy.results.roundingFootnote)}</p>
             </div>
 
             <div class="instruction-box" id="cuttingInstruction">${defInstruction}</div>
