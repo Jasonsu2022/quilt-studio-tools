@@ -266,33 +266,37 @@ export function buildBackingSvgString(res, copyObj, inputUnit) {
   const ox = padLeft + (maxDrawW - drawW) / 2;
   const oy = padTop + (maxDrawH - drawH) / 2;
 
-  const panelsSvg = d.panels
+  const panelRectsSvg = d.panels
     .map((p) => {
       const px = ox + p.x * scale;
       const py = oy + p.y * scale;
       const pw = p.drawWidth * scale;
       const ph = p.drawHeight * scale;
-      const rectSvg = `<rect x="${px.toFixed(1)}" y="${py.toFixed(1)}" width="${pw.toFixed(1)}" height="${ph.toFixed(1)}" fill="#E8F0EC" stroke="#2B5447" stroke-width="1.5" />`;
+      return `<rect x="${px.toFixed(1)}" y="${py.toFixed(1)}" width="${pw.toFixed(1)}" height="${ph.toFixed(1)}" fill="#E8F0EC" stroke="#2B5447" stroke-width="1.5" />`;
+    })
+    .join("");
+
+  const panelLabelsSvg = d.panels
+    .map((p) => {
+      const px = ox + p.x * scale;
+      const py = oy + p.y * scale;
+      const pw = p.drawWidth * scale;
+      const ph = p.drawHeight * scale;
       if (d.panels.length === 1) {
         const label = `${fmt(p.cutWidth)} usable width`;
         const labelX = ox + drawW / 2;
         const labelY = Math.max(16, oy - 10);
-        return (
-          rectSvg +
-          `<text x="${labelX.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="#2B5447">${escapeHtml(label)}</text>`
-        );
+        return `<text x="${labelX.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="#2B5447">${escapeHtml(label)}</text>`;
       }
       const label = `P${p.index} (${fmt(p.cutWidth)})`;
       const showLabel = pw > 52 && ph > 24;
+      if (!showLabel) return "";
       const labelX = px + pw / 2;
       const labelY =
         d.orientation === "vertical" ? py + 16 : py + ph / 2 + 4;
-      return (
-        rectSvg +
-        (showLabel
-          ? `<text x="${labelX.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#2B5447">${escapeHtml(label)}</text>`
-          : "")
-      );
+      const pillW = Math.min(pw - 6, Math.max(48, label.length * 6.4 + 12));
+      const pillH = 15;
+      return `<rect x="${(labelX - pillW / 2).toFixed(1)}" y="${(labelY - 10.5).toFixed(1)}" width="${pillW.toFixed(1)}" height="${pillH}" rx="4" fill="rgba(250,247,242,0.88)" /><text x="${labelX.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#2B5447">${escapeHtml(label)}</text>`;
     })
     .join("");
 
@@ -311,11 +315,20 @@ export function buildBackingSvgString(res, copyObj, inputUnit) {
   const qy = oy + q.y * scale;
   const qw = q.width * scale;
   const qh = q.height * scale;
+  const qcx = qx + qw / 2;
+  const qcy = qy + qh / 2;
+  const dimText = `${fmt(q.width)} × ${fmt(q.height)}`;
+  const badgeW = Math.min(
+    Math.max(40, qw - 8),
+    Math.max(82, Math.max(9, dimText.length) * 7.2 + 20)
+  );
+  const badgeH = 36;
 
-  const quiltTopSvg = `
-    <rect x="${qx.toFixed(1)}" y="${qy.toFixed(1)}" width="${qw.toFixed(1)}" height="${qh.toFixed(1)}" fill="rgba(255,255,255,0.45)" stroke="#241D18" stroke-width="1.6" stroke-dasharray="5 4" rx="2" />
-    <text x="${(qx + qw / 2).toFixed(1)}" y="${(qy + qh / 2 - 4).toFixed(1)}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241D18">Quilt Top</text>
-    <text x="${(qx + qw / 2).toFixed(1)}" y="${(qy + qh / 2 + 12).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="#52473E">${escapeHtml(fmt(q.width))} × ${escapeHtml(fmt(q.height))}</text>
+  const quiltTopRectSvg = `<rect x="${qx.toFixed(1)}" y="${qy.toFixed(1)}" width="${qw.toFixed(1)}" height="${qh.toFixed(1)}" fill="rgba(255,255,255,0.45)" stroke="#241D18" stroke-width="1.6" stroke-dasharray="5 4" rx="2" />`;
+  const quiltTopLabelSvg = `
+    <rect x="${(qcx - badgeW / 2).toFixed(1)}" y="${(qcy - badgeH / 2).toFixed(1)}" width="${badgeW.toFixed(1)}" height="${badgeH}" rx="6" fill="rgba(250,247,242,0.90)" />
+    <text x="${qcx.toFixed(1)}" y="${(qcy - 4).toFixed(1)}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241D18">Quilt Top</text>
+    <text x="${qcx.toFixed(1)}" y="${(qcy + 12).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="#52473E">${escapeHtml(dimText)}</text>
   `;
 
   // Total width callout (bottom) & total length callout (left)
@@ -338,9 +351,11 @@ export function buildBackingSvgString(res, copyObj, inputUnit) {
 
   return `<svg viewBox="0 0 ${vbW} ${vbH}" width="100%" role="img" aria-label="${escapeHtml(altText)}" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;height:auto;display:block;margin:0 auto;font-family:'Plus Jakarta Sans',sans-serif;">
     <title>${escapeHtml(altText)}</title>
-    ${panelsSvg}
-    ${quiltTopSvg}
+    ${panelRectsSvg}
+    ${quiltTopRectSvg}
     ${seamsSvg}
+    ${panelLabelsSvg}
+    ${quiltTopLabelSvg}
     <text x="${(ox + drawW / 2).toFixed(1)}" y="${dimBottomY.toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#241D18">Backing Width: ${escapeHtml(fmt(d.backingWidth))}</text>
     <text x="${dimLeftX.toFixed(1)}" y="${(oy + drawH / 2).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#241D18" transform="rotate(-90 ${dimLeftX.toFixed(1)} ${(oy + drawH / 2).toFixed(1)})">Length: ${escapeHtml(fmt(d.backingLength))}</text>
   </svg>`;

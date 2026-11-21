@@ -709,7 +709,7 @@ a:focus-visible {
 
 .adv-hint {
   margin-top: 5px;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--text-secondary);
   line-height: 1.4;
 }
@@ -989,7 +989,7 @@ a:focus-visible {
 
 .diagram-note {
   margin-top: 10px;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--text-secondary);
   text-align: center;
   font-style: italic;

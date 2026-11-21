@@ -76,13 +76,26 @@ function renderStaticSvg(res) {
   const ox = padLeft + (maxDrawW - drawW) / 2;
   const oy = padTop + (maxDrawH - drawH) / 2;
 
-  const panelsSvg = d.panels
+  const panelRectsSvg = d.panels
     .map((panel) => {
       const px = ox + panel.x * scale;
       const py = oy + panel.y * scale;
       const pw = panel.drawWidth * scale;
       const ph = panel.drawHeight * scale;
-      return `<rect x="${px.toFixed(1)}" y="${py.toFixed(1)}" width="${pw.toFixed(1)}" height="${ph.toFixed(1)}" fill="#E8F0EC" stroke="#2B5447" stroke-width="1.5" /><text x="${(px + pw / 2).toFixed(1)}" y="${(py + 16).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#2B5447">P${panel.index} (${formatInchesDisplay(panel.cutWidth)}")</text>`;
+      return `<rect x="${px.toFixed(1)}" y="${py.toFixed(1)}" width="${pw.toFixed(1)}" height="${ph.toFixed(1)}" fill="#E8F0EC" stroke="#2B5447" stroke-width="1.5" />`;
+    })
+    .join("");
+
+  const panelLabelsSvg = d.panels
+    .map((panel) => {
+      const px = ox + panel.x * scale;
+      const py = oy + panel.y * scale;
+      const pw = panel.drawWidth * scale;
+      const label = `P${panel.index} (${formatInchesDisplay(panel.cutWidth)}")`;
+      const labelX = px + pw / 2;
+      const labelY = py + 16;
+      const pillW = Math.min(pw - 6, Math.max(48, label.length * 6.4 + 12));
+      return `<rect x="${(labelX - pillW / 2).toFixed(1)}" y="${(labelY - 10.5).toFixed(1)}" width="${pillW.toFixed(1)}" height="15" rx="4" fill="rgba(250,247,242,0.88)" /><text x="${labelX.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#2B5447">${label}</text>`;
     })
     .join("");
 
@@ -101,6 +114,14 @@ function renderStaticSvg(res) {
   const qy = oy + q.y * scale;
   const qw = q.width * scale;
   const qh = q.height * scale;
+  const qcx = qx + qw / 2;
+  const qcy = qy + qh / 2;
+  const dimText = `${formatInchesDisplay(q.width)}" × ${formatInchesDisplay(q.height)}"`;
+  const badgeW = Math.min(
+    Math.max(40, qw - 8),
+    Math.max(82, Math.max(9, dimText.length) * 7.2 + 20)
+  );
+  const badgeH = 36;
   const altText = interpolate(copy.diagram.altTemplate, {
     mode: copy.results.orientationVertical,
     panels: d.panelCount,
@@ -110,7 +131,7 @@ function renderStaticSvg(res) {
     ql: `${formatInchesDisplay(q.height)}"`
   });
 
-  return `<svg viewBox="0 0 ${vbW} ${vbH}" width="100%" role="img" aria-label="${escapeHtml(altText)}" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;height:auto;display:block;margin:0 auto;font-family:'Plus Jakarta Sans',sans-serif;"><title>${escapeHtml(altText)}</title>${panelsSvg}<rect x="${qx.toFixed(1)}" y="${qy.toFixed(1)}" width="${qw.toFixed(1)}" height="${qh.toFixed(1)}" fill="rgba(255,255,255,0.45)" stroke="#241D18" stroke-width="1.6" stroke-dasharray="5 4" rx="2" /><text x="${(qx + qw / 2).toFixed(1)}" y="${(qy + qh / 2 - 4).toFixed(1)}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241D18">Quilt Top</text><text x="${(qx + qw / 2).toFixed(1)}" y="${(qy + qh / 2 + 12).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="#52473E">${formatInchesDisplay(q.width)}" × ${formatInchesDisplay(q.height)}"</text>${seamsSvg}<text x="${(ox + drawW / 2).toFixed(1)}" y="${(oy + drawH + 22).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#241D18">Backing Width: ${formatInchesDisplay(d.backingWidth)}"</text><text x="${(ox - 16).toFixed(1)}" y="${(oy + drawH / 2).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#241D18" transform="rotate(-90 ${(ox - 16).toFixed(1)} ${(oy + drawH / 2).toFixed(1)})">Length: ${formatInchesDisplay(d.backingLength)}"</text></svg>`;
+  return `<svg viewBox="0 0 ${vbW} ${vbH}" width="100%" role="img" aria-label="${escapeHtml(altText)}" xmlns="http://www.w3.org/2000/svg" style="max-width:460px;height:auto;display:block;margin:0 auto;font-family:'Plus Jakarta Sans',sans-serif;"><title>${escapeHtml(altText)}</title>${panelRectsSvg}<rect x="${qx.toFixed(1)}" y="${qy.toFixed(1)}" width="${qw.toFixed(1)}" height="${qh.toFixed(1)}" fill="rgba(255,255,255,0.45)" stroke="#241D18" stroke-width="1.6" stroke-dasharray="5 4" rx="2" />${seamsSvg}${panelLabelsSvg}<rect x="${(qcx - badgeW / 2).toFixed(1)}" y="${(qcy - badgeH / 2).toFixed(1)}" width="${badgeW.toFixed(1)}" height="${badgeH}" rx="6" fill="rgba(250,247,242,0.90)" /><text x="${qcx.toFixed(1)}" y="${(qcy - 4).toFixed(1)}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241D18">Quilt Top</text><text x="${qcx.toFixed(1)}" y="${(qcy + 12).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="#52473E">${dimText}</text><text x="${(ox + drawW / 2).toFixed(1)}" y="${(oy + drawH + 22).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#241D18">Backing Width: ${formatInchesDisplay(d.backingWidth)}"</text><text x="${(ox - 16).toFixed(1)}" y="${(oy + drawH / 2).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#241D18" transform="rotate(-90 ${(ox - 16).toFixed(1)} ${(oy + drawH / 2).toFixed(1)})">Length: ${formatInchesDisplay(d.backingLength)}"</text></svg>`;
 }
 
 const presetsHtml = PRESETS.map((pr) => {
@@ -226,7 +247,7 @@ const html = `<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./styles.css?v=1.3.1" />
+  <link rel="stylesheet" href="./styles.css?v=1.3.2" />
   <script id="faq-jsonld" type="application/ld+json">${faqJsonLd}</script>
   <script id="app-jsonld" type="application/ld+json">${appJsonLd}</script>
   <script id="breadcrumb-jsonld" type="application/ld+json">${breadcrumbJsonLd}</script>
@@ -564,7 +585,7 @@ ${faqHtml}
     </section>
   </div>
 
-  <script type="module" src="./app.js?v=1.3"></script>
+  <script type="module" src="./app.js?v=1.3.2"></script>
 </body>
 </html>
 `;
