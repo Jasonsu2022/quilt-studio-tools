@@ -167,6 +167,31 @@ const faqJsonLd = JSON.stringify({
   }))
 });
 
+const appJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: copy.header.title,
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Web",
+  url: "https://tools.3145201.xyz/quilt-binding-calculator/",
+  description: copy.meta.description,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" }
+});
+
+const breadcrumbJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://tools.3145201.xyz/" },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: copy.header.title,
+      item: "https://tools.3145201.xyz/quilt-binding-calculator/"
+    }
+  ]
+});
+
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -174,11 +199,14 @@ const html = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${escapeHtml(copy.meta.title)}</title>
   <meta name="description" content="${escapeHtml(copy.meta.description)}" />
+  <link rel="canonical" href="https://tools.3145201.xyz/quilt-binding-calculator/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
   <script id="faq-jsonld" type="application/ld+json">${faqJsonLd}</script>
+  <script id="app-jsonld" type="application/ld+json">${appJsonLd}</script>
+  <script id="breadcrumb-jsonld" type="application/ld+json">${breadcrumbJsonLd}</script>
   <script defer src="../config/analytics.js"></script>
 </head>
 <body>

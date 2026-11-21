@@ -1,0 +1,223 @@
+{
+  "meta": {
+    "title": "Quilt Backing & Batting Calculator — Fabric Yardage, Panels & Layout Diagram",
+    "description": "Free quilt backing and batting calculator. Find exact fabric yardage or metres for 42\", 44\", 54\", or 108\" wideback, compare vertical vs. horizontal piecing with 1/2\" seams, view a live layout diagram, and match standard batting packages."
+  },
+  "nav": {
+    "siteName": "Quilt Studio Tools",
+    "home": "Home",
+    "binding": "Binding Calculator",
+    "about": "About"
+  },
+  "header": {
+    "title": "Quilt Backing & Batting Calculator",
+    "subtitle": "Yardage, panel piecing diagram & batting size match"
+  },
+  "units": {
+    "ariaLabel": "Measurement units",
+    "imperial": "Imperial (in / yd)",
+    "metric": "Metric (cm / m)",
+    "mixed": "Mixed (in / m)",
+    "imperialShort": "in / yd",
+    "metricShort": "cm / m",
+    "mixedShort": "in / m",
+    "in": "in",
+    "cm": "cm",
+    "yd": "yd",
+    "yard": "yard",
+    "yards": "yards",
+    "m": "m"
+  },
+  "inputs": {
+    "dimensionsLabel": "Quilt Top Dimensions",
+    "width": "Quilt Width",
+    "length": "Quilt Length",
+    "widthPlaceholder": "60",
+    "lengthPlaceholder": "80",
+    "fabricWidth": {
+      "label": "Backing Fabric Width (WOF)",
+      "custom": "Custom",
+      "inputLabel": "Bolt width",
+      "hint": "Standard quilting cotton is 42\"–44\"; wideback is typically 108\"."
+    },
+    "overage": {
+      "label": "Quilting Overage (per side)",
+      "domestic": "Domestic / Hand",
+      "domesticHint": "3\" per side",
+      "longarm": "Longarm",
+      "longarmHint": "4\" per side",
+      "custom": "Custom",
+      "customHint": "Set your own",
+      "inputLabel": "Extra inches per side"
+    },
+    "directional": {
+      "label": "Directional Print Fabric",
+      "hint": "Locks vertical seams so prints run upright along the quilt length."
+    }
+  },
+  "advanced": {
+    "toggle": "Advanced Options",
+    "edit": "Edit",
+    "done": "Hide",
+    "reset": "Reset to defaults",
+    "summaryTemplate": "Selvage -{selvage} (Usable {usable}) · 1/2\" seam allowance",
+    "selvage": "Selvage Deduction",
+    "selvageHint": "Default 2\" (1\" trimmed from each selvage edge). Set to 0\" if your width is already usable WOF.",
+    "seamLabel": "Piecing Seam Allowance",
+    "seamValue": "1/2\" per edge (1.0\" net loss per seam)",
+    "seamHint": "Fixed 1/2\" seam allowance for sturdy, flat-pressed backing seams."
+  },
+  "results": {
+    "buyHeading": "Backing Fabric to Buy",
+    "altBuyMetric": "Or buy {altBuy} (metric shop)",
+    "altBuyImperial": "Or buy {altBuy} (imperial shop)",
+    "roundingImperial": "Rounded up to nearest 1/8 yard · {exact} exact",
+    "roundingMetric": "Rounded up to nearest 0.05 m · {exact} exact",
+    "orientationSingle": "Single Panel (No Seams)",
+    "orientationVertical": "Vertical Seams (Lengthwise)",
+    "orientationHorizontal": "Horizontal Seams (Crosswise)",
+    "instructionSingle": "Buy {buy} and cut <strong>1 piece</strong> at <strong>{cutLength}</strong> long (no piecing needed).",
+    "instructionPieced": "Cut <strong>{panels} panels</strong> of <strong>{cutLength}</strong> each; sew with {seams} {seamWord} (1/2\" seam allowance).",
+    "panelSingular": "panel",
+    "panelPlural": "panels",
+    "seamSingular": "seam",
+    "seamPlural": "seams",
+    "panelsLabel": "Panels",
+    "seamsLabel": "Seams",
+    "cutLengthLabel": "Cut Length / Panel",
+    "usableWofNote": "Usable {usable} each",
+    "backingSizeLabel": "Backing Size",
+    "altCard": {
+      "heading": "Alternative Seam Direction",
+      "verticalName": "Vertical Seams",
+      "horizontalName": "Horizontal Seams",
+      "summary": "{panels} {panelWord} × {cutLength} ({seams} {seamWord}) — {buy}",
+      "directionalTitle": "Locked to Vertical Seams",
+      "directionalBody": "Directional print is enabled, so horizontal piecing is skipped to keep your print oriented upright along the quilt length."
+    },
+    "widebackBanner": {
+      "multiPanel": "This layout uses {panels} panels ({seams} seams). Consider 108\" wideback fabric to reduce or eliminate seams.",
+      "widebackExceeded": "Your target backing exceeds 108\" wideback in a single width, so 2 panels (1 seam) are still required—or use 120\" extra-wide backing."
+    },
+    "battingCard": {
+      "heading": "Recommended Batting",
+      "minSizeLabel": "Minimum Batting Size",
+      "packageLabel": "Best Pre-Packaged Size",
+      "packageDetail": "Matches {pkgName} ({pkgDim}) with room for {overage} overage on all 4 sides.",
+      "exceedKingName": "Exceeds King (120\" × 120\")",
+      "exceedKingDetail": "Buy batting off the roll by the yard (90\", 96\", or 120\" wide) or piece two batting sections together."
+    }
+  },
+  "diagram": {
+    "heading": "Backing Layout & Piecing Diagram",
+    "scaleNote": "Proportional layout showing usable panels, 1/2\" seam lines, and centered quilt top with overage.",
+    "legendBacking": "Backing panel",
+    "legendQuiltTop": "Quilt top",
+    "legendSeam": "1/2\" seam",
+    "altTemplate": "Backing layout diagram: {mode}, {panels} panel(s), total backing {bw} by {bl} covering a {qw} by {ql} quilt top."
+  },
+  "actions": {
+    "printCard": "Print Cutting Card",
+    "copyPlan": "Copy Cutting Plan",
+    "copied": "Copied!"
+  },
+  "stickyBar": {
+    "viewDetails": "View Plan"
+  },
+  "completeProject": {
+    "heading": "Complete Your Project",
+    "cardTitle": "Quilt Binding Calculator",
+    "cardDesc": "Finished sizing your backing? Calculate exact straight-of-grain or bias binding strips and yardage for the same quilt.",
+    "cardCta": "Open Binding Calculator →",
+    "href": "../quilt-binding-calculator/"
+  },
+  "seo": {
+    "sections": [
+      {
+        "heading": "How the Quilt Backing & Batting Calculator Works",
+        "paragraphs": [
+          "First, we add your chosen overage to all four sides of your quilt top (Wt = W + 2 × O, Lt = L + 2 × O). Domestic machine or hand quilting typically needs 3 inches per side (6 inches total), while longarm quilting frames require at least 4 inches per side (8 inches total) for clamps and leaders.",
+          "Next, we subtract a 2-inch selvage allowance from your bolt width to find your usable fabric width (for example, 44\" quilting cotton gives 42\" usable width). If your target backing fits within one usable width, you only need a single piece. Otherwise, we calculate the panels needed in both directions using a sturdy 1/2\" seam allowance (1\" net width lost per seam) and automatically choose the layout that uses the least fabric—unless you lock Directional Print to keep patterns upright."
+        ]
+      },
+      {
+        "heading": "Standard 44\" Cotton vs. 108\" Wideback Fabric",
+        "paragraphs": [
+          "Standard 42\"–44\" quilting cotton is easy to match to your quilt top and widely available, but any quilt wider than 42\" after overage requires piecing two or more panels. Using 108\" wideback eliminates seams completely on most Throw, Twin, and Queen quilts, saving piecing time and creating a smoother back—just remember that oversized King quilts (over 106\" finished) still need one seam even with 108\" wideback."
+        ]
+      }
+    ],
+    "chartHeading": "Standard Pre-Packaged Quilt Batting Sizes",
+    "chartNote": "Always match batting against your quilt top PLUS overage (typically +6\" to +8\" total width and length), not the finished quilt size alone.",
+    "chartColumns": {
+      "size": "Package Size",
+      "dimensionsIn": "Size (in)",
+      "dimensionsCm": "Size (cm)",
+      "bestFor": "Best For (Finished Quilt Up To)"
+    },
+    "chartRows": [
+      { "size": "Craft", "in": "36\" × 45\"", "cm": "91 × 114 cm", "bestFor": "30\" × 39\" (wall hangings, runners)" },
+      { "size": "Crib / Baby", "in": "45\" × 60\"", "cm": "114 × 152 cm", "bestFor": "39\" × 54\" (baby & crib quilts)" },
+      { "size": "Twin", "in": "72\" × 90\"", "cm": "183 × 229 cm", "bestFor": "66\" × 84\" (throws & twin beds)" },
+      { "size": "Full / Double", "in": "81\" × 96\"", "cm": "206 × 244 cm", "bestFor": "75\" × 90\" (full beds)" },
+      { "size": "Queen", "in": "90\" × 108\"", "cm": "229 × 274 cm", "bestFor": "84\" × 102\" (queen beds)" },
+      { "size": "King", "in": "120\" × 120\"", "cm": "305 × 305 cm", "bestFor": "112\" × 112\" (king & cal king)" }
+    ]
+  },
+  "battingPackages": {
+    "craft": { "name": "Craft", "dim": "36\" × 45\"" },
+    "crib": { "name": "Crib / Baby", "dim": "45\" × 60\"" },
+    "twin": { "name": "Twin", "dim": "72\" × 90\"" },
+    "full": { "name": "Full / Double", "dim": "81\" × 96\"" },
+    "queen": { "name": "Queen", "dim": "90\" × 108\"" },
+    "king": { "name": "King", "dim": "120\" × 120\"" }
+  },
+  "faq": {
+    "heading": "Frequently Asked Questions",
+    "items": [
+      {
+        "q": "How much overage do I need for longarm vs. domestic quilting?",
+        "a": "Most longarm quilters require at least 4 inches of extra backing and batting on every side (adding 8 inches total to both width and length) so the quilt can be pinned or clamped onto the frame leaders. If you are basting and quilting on a domestic sewing machine or by hand, 3 inches per side (6 inches total) is usually plenty."
+      },
+      {
+        "q": "When is 108\" wideback worth buying?",
+        "a": "For Throw, Twin, and Queen quilts, 108\" wideback lets you cut a seamless single-piece backing with zero piecing and often uses less total yardage than piecing three widths of 44\" cotton. Only oversized King quilts whose backing target exceeds 106\" on both sides still require one seam on 108\" fabric."
+      },
+      {
+        "q": "What does Directional Print Fabric do?",
+        "a": "When your backing fabric has a one-way print (like trees, text, or animals), turning panels sideways to save yardage would make the print lie on its side. Enabling Directional Print locks the calculator to vertical seams so every panel runs upright along the quilt length."
+      },
+      {
+        "q": "How do I choose the right pre-packaged batting size?",
+        "a": "Compare your minimum batting size (quilt top plus your overage on all four sides) against standard package dimensions. A package can be rotated 90 degrees if needed. If a Queen quilt top (90\" × 96\") needs 4\" longarm overage per side (98\" × 104\"), a 90\" × 108\" Queen package is too narrow—step up to a 120\" × 120\" King package."
+      },
+      {
+        "q": "Why does the calculator deduct 2\" for selvages and use 1/2\" seams?",
+        "a": "Woven selvage edges are tighter than the rest of the fabric and can pucker after washing, so trimming about 1\" from each edge (2\" total) keeps your backing flat. Joining backing panels with a generous 1/2\" seam allowance (1\" net loss per seam) pressed open creates a strong, low-bulk seam that handles quilting tension safely."
+      }
+    ]
+  },
+  "printCard": {
+    "title": "Quilt Backing & Batting Cutting Card",
+    "projectLabel": "Project:",
+    "dateLabel": "Date:",
+    "quiltSpecLabel": "Quilt Top:",
+    "fabricSpecLabel": "Fabric:",
+    "footer": "Printed from Quilt Studio Tools — Quilt Backing Calculator"
+  },
+  "validation": {
+    "positiveNumber": "Please check the highlighted field and enter a valid positive number.",
+    "widthPositive": "Enter a quilt width greater than 0.",
+    "lengthPositive": "Enter a quilt length greater than 0.",
+    "fabricWidthTooSmall": "Enter a fabric width greater than 4\".",
+    "nonNegative": "Enter 0 or a positive number.",
+    "usableWofTooSmall": "Usable fabric width (after selvage deduction) must be greater than 1\"."
+  },
+  "warnings": {
+    "largeDimension": "Heads up: one of your quilt dimensions is over 150\" (381 cm). Double-check the number or unit."
+  },
+  "footer": {
+    "copyright": "Quilt Studio Tools — Free quilting calculators.",
+    "aboutLink": "About & Contact"
+  }
+}

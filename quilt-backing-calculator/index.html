@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quilt Backing &amp; Batting Calculator — Fabric Yardage, Panels &amp; Layout Diagram</title>
+  <meta name="description" content="Free quilt backing and batting calculator. Find exact fabric yardage or metres for 42&quot;, 44&quot;, 54&quot;, or 108&quot; wideback, compare vertical vs. horizontal piecing with 1/2&quot; seams, view a live layout diagram, and match standard batting packages." />
+  <link rel="canonical" href="https://tools.3145201.xyz/quilt-backing-calculator/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script id="faq-jsonld" type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How much overage do I need for longarm vs. domestic quilting?","acceptedAnswer":{"@type":"Answer","text":"Most longarm quilters require at least 4 inches of extra backing and batting on every side (adding 8 inches total to both width and length) so the quilt can be pinned or clamped onto the frame leaders. If you are basting and quilting on a domestic sewing machine or by hand, 3 inches per side (6 inches total) is usually plenty."}},{"@type":"Question","name":"When is 108\" wideback worth buying?","acceptedAnswer":{"@type":"Answer","text":"For Throw, Twin, and Queen quilts, 108\" wideback lets you cut a seamless single-piece backing with zero piecing and often uses less total yardage than piecing three widths of 44\" cotton. Only oversized King quilts whose backing target exceeds 106\" on both sides still require one seam on 108\" fabric."}},{"@type":"Question","name":"What does Directional Print Fabric do?","acceptedAnswer":{"@type":"Answer","text":"When your backing fabric has a one-way print (like trees, text, or animals), turning panels sideways to save yardage would make the print lie on its side. Enabling Directional Print locks the calculator to vertical seams so every panel runs upright along the quilt length."}},{"@type":"Question","name":"How do I choose the right pre-packaged batting size?","acceptedAnswer":{"@type":"Answer","text":"Compare your minimum batting size (quilt top plus your overage on all four sides) against standard package dimensions. A package can be rotated 90 degrees if needed. If a Queen quilt top (90\" × 96\") needs 4\" longarm overage per side (98\" × 104\"), a 90\" × 108\" Queen package is too narrow—step up to a 120\" × 120\" King package."}},{"@type":"Question","name":"Why does the calculator deduct 2\" for selvages and use 1/2\" seams?","acceptedAnswer":{"@type":"Answer","text":"Woven selvage edges are tighter than the rest of the fabric and can pucker after washing, so trimming about 1\" from each edge (2\" total) keeps your backing flat. Joining backing panels with a generous 1/2\" seam allowance (1\" net loss per seam) pressed open creates a strong, low-bulk seam that handles quilting tension safely."}}]}</script>
+  <script id="app-jsonld" type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Quilt Backing & Batting Calculator","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","url":"https://tools.3145201.xyz/quilt-backing-calculator/","description":"Free quilt backing and batting calculator. Find exact fabric yardage or metres for 42\", 44\", 54\", or 108\" wideback, compare vertical vs. horizontal piecing with 1/2\" seams, view a live layout diagram, and match standard batting packages.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+  <script id="breadcrumb-jsonld" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://tools.3145201.xyz/"},{"@type":"ListItem","position":2,"name":"Quilt Backing & Batting Calculator","item":"https://tools.3145201.xyz/quilt-backing-calculator/"}]}</script>
+  <script defer src="../config/analytics.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <div class="top-header-wrap no-print">
+      <nav class="site-nav" aria-label="Site navigation">
+        <a class="site-brand" href="../">Quilt Studio Tools</a>
+        <div class="site-nav-links">
+          <a href="../">Home</a>
+          <a href="../quilt-binding-calculator/">Binding Calculator</a>
+          <a href="../about/">About</a>
+        </div>
+      </nav>
+
+      <div class="header-row">
+        <header class="page-header">
+          <h1>Quilt Backing &amp; Batting Calculator</h1>
+          <p class="page-subtitle">Yardage, panel piecing diagram &amp; batting size match</p>
+        </header>
+
+        <div class="unit-switcher" role="group" id="unitSwitcher" aria-label="Measurement units">
+          <button type="button" class="unit-btn" data-unit="imperial" aria-pressed="true">
+            <span class="unit-label-full">Imperial (in / yd)</span>
+            <span class="unit-label-short">in / yd</span>
+          </button>
+          <button type="button" class="unit-btn" data-unit="metric" aria-pressed="false">
+            <span class="unit-label-full">Metric (cm / m)</span>
+            <span class="unit-label-short">cm / m</span>
+          </button>
+          <button type="button" class="unit-btn" data-unit="mixed" aria-pressed="false">
+            <span class="unit-label-full">Mixed (in / m)</span>
+            <span class="unit-label-short">in / m</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <main class="core-grid no-print">
+      <!-- Input Card -->
+      <section class="card" aria-label="Quilt backing inputs">
+        <div class="field-group">
+          <span class="field-label" style="margin-bottom: 10px;">Quilt Top Dimensions</span>
+          <div class="dim-row">
+            <div>
+              <label class="field-label" for="inputWidth">Quilt Width</label>
+              <div class="input-wrap" style="margin-top: 8px;">
+                <input id="inputWidth" class="num-input" type="text" inputmode="decimal" autocomplete="off" placeholder="60" value="60" />
+                <span class="input-suffix" data-unit-suffix>in</span>
+              </div>
+              <p class="field-error-msg" id="errWidth" hidden role="alert"></p>
+            </div>
+            <div>
+              <label class="field-label" for="inputLength">Quilt Length</label>
+              <div class="input-wrap" style="margin-top: 8px;">
+                <input id="inputLength" class="num-input" type="text" inputmode="decimal" autocomplete="off" placeholder="80" value="80" />
+                <span class="input-suffix" data-unit-suffix>in</span>
+              </div>
+              <p class="field-error-msg" id="errLength" hidden role="alert"></p>
+            </div>
+          </div>
+          <div class="dim-warning" id="dimWarning" hidden role="status"></div>
+        </div>
+
+        <div class="field-group">
+          <span class="field-label" style="margin-bottom: 10px;">Backing Fabric Width (WOF)</span>
+          <div class="wof-grid" id="wofGrid">
+            <button type="button" class="strip-btn" data-wof="42" aria-pressed="false"><span>42"</span></button>
+            <button type="button" class="strip-btn" data-wof="44" aria-pressed="true"><span>44"</span></button>
+            <button type="button" class="strip-btn" data-wof="54" aria-pressed="false"><span>54"</span></button>
+            <button type="button" class="strip-btn" data-wof="108" aria-pressed="false"><span>108"</span></button>
+            <button type="button" class="strip-btn" data-wof="custom" aria-pressed="false"><span>Custom</span></button>
+          </div>
+          <div class="inline-drawer">
+            <label for="inputFabricWidth">Bolt width</label>
+            <div class="input-wrap">
+              <input id="inputFabricWidth" class="num-input" type="text" inputmode="decimal" autocomplete="off" value="44" />
+              <span class="input-suffix" data-unit-suffix>in</span>
+            </div>
+            <p class="field-error-msg" id="errFabricWidth" hidden role="alert"></p>
+            <p class="adv-hint">Standard quilting cotton is 42&quot;–44&quot;; wideback is typically 108&quot;.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <span class="field-label" style="margin-bottom: 10px;">Quilting Overage (per side)</span>
+          <div class="overage-grid" role="group">
+            <button type="button" class="cut-btn" data-method="domestic" aria-pressed="true">
+              <span class="cut-btn-title">Domestic / Hand</span>
+              <span class="cut-btn-hint">3&quot; per side</span>
+            </button>
+            <button type="button" class="cut-btn" data-method="longarm" aria-pressed="false">
+              <span class="cut-btn-title">Longarm</span>
+              <span class="cut-btn-hint">4&quot; per side</span>
+            </button>
+            <button type="button" class="cut-btn" data-method="custom" aria-pressed="false">
+              <span class="cut-btn-title">Custom</span>
+              <span class="cut-btn-hint">Set your own</span>
+            </button>
+          </div>
+          <div class="inline-drawer">
+            <label for="inputOverage">Extra inches per side</label>
+            <div class="input-wrap">
+              <input id="inputOverage" class="num-input" type="text" inputmode="decimal" autocomplete="off" value="3" />
+              <span class="input-suffix" data-unit-suffix>in</span>
+            </div>
+            <p class="field-error-msg" id="errOverage" hidden role="alert"></p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="toggle-row" for="inputDirectional">
+            <span class="toggle-text">
+              <span class="toggle-title">Directional Print Fabric</span>
+              <span class="toggle-hint">Locks vertical seams so prints run upright along the quilt length.</span>
+            </span>
+            <input id="inputDirectional" class="switch-input" type="checkbox" />
+          </label>
+        </div>
+
+        <div class="advanced-box">
+          <button type="button" class="advanced-toggle" id="advancedToggle" aria-expanded="false" aria-controls="advancedPanel">
+            <span class="advanced-toggle-text">
+              <span class="advanced-title">Advanced Options</span>
+              <span class="advanced-summary" id="advancedSummary">Selvage -2&quot; (Usable 42&quot;) · 1/2&quot; seam allowance</span>
+            </span>
+            <span class="advanced-action-pill" id="advancedActionPill">Edit</span>
+          </button>
+
+          <div class="advanced-panel" id="advancedPanel" hidden>
+            <div class="adv-field">
+              <label for="inputSelvage">Selvage Deduction</label>
+              <div class="input-wrap">
+                <input id="inputSelvage" class="num-input" type="text" inputmode="decimal" autocomplete="off" value="2" />
+                <span class="input-suffix" data-unit-suffix>in</span>
+              </div>
+              <p class="field-error-msg" id="errSelvage" hidden role="alert"></p>
+              <p class="adv-hint">Default 2&quot; (1&quot; trimmed from each selvage edge). Set to 0&quot; if your width is already usable WOF.</p>
+            </div>
+
+            <div class="adv-field">
+              <label>Piecing Seam Allowance</label>
+              <div class="readonly-spec">1/2&quot; per edge (1.0&quot; net loss per seam)</div>
+              <p class="adv-hint">Fixed 1/2&quot; seam allowance for sturdy, flat-pressed backing seams.</p>
+            </div>
+
+            <div class="adv-reset-row">
+              <button type="button" class="btn-reset" id="btnReset">Reset to defaults</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Column (Fixed Order 1-5) -->
+      <div class="results-column">
+        <!-- 1. Primary Plan -->
+        <section class="result-card" id="resultCard" aria-live="polite">
+          <div class="result-error" id="resultError" hidden></div>
+
+          <div class="result-valid" id="resultValid">
+            <div class="buy-hero">
+              <div class="orientation-pill" id="orientationPill">Vertical Seams (Lengthwise)</div>
+              <div class="buy-label">Backing Fabric to Buy</div>
+              <div class="buy-value" id="buyValue">4 7/8 yards</div>
+              <div class="buy-sub" id="buySub">Or buy 4.40 m (metric shop)</div>
+              <div class="buy-rounding" id="buyRounding">Rounded up to nearest 1/8 yard · 4.78 yd exact</div>
+            </div>
+
+            <div class="instruction-box" id="cuttingInstruction">Cut <strong>2 panels</strong> of <strong>86"</strong> each; sew with 1 seam (1/2" seam allowance).</div>
+
+            <div class="breakdown-grid-4">
+              <div class="breakdown-cell">
+                <div class="breakdown-label">Panels</div>
+                <div class="breakdown-value" id="bdPanelsVal">2 panels</div>
+              </div>
+              <div class="breakdown-cell">
+                <div class="breakdown-label">Seams</div>
+                <div class="breakdown-value" id="bdSeamsVal">1 seam</div>
+              </div>
+              <div class="breakdown-cell">
+                <div class="breakdown-label">Cut Length / Panel</div>
+                <div class="breakdown-value" id="bdCutLenVal">86"</div>
+                <div class="breakdown-sub" id="bdCutLenSub">Usable 42" each</div>
+              </div>
+              <div class="breakdown-cell">
+                <div class="breakdown-label">Backing Size</div>
+                <div class="breakdown-value" id="bdBackingSizeVal">66" × 86"</div>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button type="button" class="btn-print" id="btnPrint">Print Cutting Card</button>
+              <button type="button" class="btn-copy" id="btnCopy">Copy Cutting Plan</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. SVG Layout Diagram -->
+        <section class="card diagram-card" id="diagramCard">
+          <h2>Backing Layout &amp; Piecing Diagram</h2>
+          <div class="diagram-stage" id="diagramStage"><svg viewBox="0 0 460 300" width="100%" role="img" aria-label="Backing layout diagram: Vertical Seams (Lengthwise), 2 panel(s), total backing 66&quot; by 86&quot; covering a 60&quot; by 80&quot; quilt top." xmlns="http://www.w3.org/2000/svg" style="max-width:460px;height:auto;display:block;margin:0 auto;font-family:'Plus Jakarta Sans',sans-serif;"><title>Backing layout diagram: Vertical Seams (Lengthwise), 2 panel(s), total backing 66&quot; by 86&quot; covering a 60&quot; by 80&quot; quilt top.</title><rect x="158.3" y="36.0" width="83.7" height="218.0" fill="#E8F0EC" stroke="#2B5447" stroke-width="1.5" /><text x="200.2" y="52.0" text-anchor="middle" font-size="10.5" font-weight="600" fill="#2B5447">P1 (42")</text><rect x="242.0" y="36.0" width="83.7" height="218.0" fill="#E8F0EC" stroke="#2B5447" stroke-width="1.5" /><text x="283.8" y="52.0" text-anchor="middle" font-size="10.5" font-weight="600" fill="#2B5447">P2 (42")</text><rect x="166.0" y="43.6" width="152.1" height="202.8" fill="rgba(255,255,255,0.45)" stroke="#241D18" stroke-width="1.6" stroke-dasharray="5 4" rx="2" /><text x="242.0" y="141.0" text-anchor="middle" font-size="11.5" font-weight="700" fill="#241D18">Quilt Top</text><text x="242.0" y="157.0" text-anchor="middle" font-size="10.5" fill="#52473E">60" × 80"</text><line x1="242.0" y1="36.0" x2="242.0" y2="254.0" stroke="#B54A28" stroke-width="2.2" stroke-dasharray="6 4" /><text x="242.0" y="276.0" text-anchor="middle" font-size="12" font-weight="700" fill="#241D18">Backing Width: 66"</text><text x="142.3" y="145.0" text-anchor="middle" font-size="12" font-weight="700" fill="#241D18" transform="rotate(-90 142.3 145.0)">Length: 86"</text></svg></div>
+          <div class="diagram-legend">
+            <span class="legend-item"><span class="legend-swatch legend-swatch--panel"></span>Backing panel</span>
+            <span class="legend-item"><span class="legend-swatch legend-swatch--quilt"></span>Quilt top</span>
+            <span class="legend-item"><span class="legend-swatch legend-swatch--seam"></span>1/2&quot; seam</span>
+          </div>
+          <p class="diagram-note">Proportional layout showing usable panels, 1/2&quot; seam lines, and centered quilt top with overage.</p>
+        </section>
+
+        <!-- 3. Alternative Direction Comparison Card -->
+        <section class="sub-result-card" id="altDirectionCard">
+          <h3 id="altCardHeading">Alternative Seam Direction</h3>
+          <div id="altCardBody">
+            <div class="alt-compare-row">
+              <span><strong>Horizontal Seams:</strong> 3 panels × 66&quot; (2 seams) — 5 1/2 yards</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Multi-panel / Wideback Tip Banner -->
+        <div class="wideback-banner" id="widebackBanner" hidden role="status"></div>
+
+        <!-- 5. Recommended Batting Card -->
+        <section class="batting-card" id="battingCard">
+          <h3>Recommended Batting</h3>
+          <div class="batting-grid">
+            <div class="batting-cell">
+              <div class="batting-cell-label">Minimum Batting Size</div>
+              <div class="batting-cell-value" id="battingMinSize">66" × 86" (167.6 × 218.4 cm)</div>
+            </div>
+            <div class="batting-cell">
+              <div class="batting-cell-label">Best Pre-Packaged Size</div>
+              <div class="batting-cell-value" id="battingPkgName">Twin (72&quot; × 90&quot;)</div>
+            </div>
+          </div>
+          <p class="batting-note" id="battingNote">Matches Twin (72&quot; × 90&quot;) with room for 3&quot; (7.6 cm) overage on all 4 sides.</p>
+        </section>
+      </div>
+    </main>
+
+    <div class="content-sections no-print">
+      <!-- Complete Your Project (Internal Cross-Link) -->
+      <section class="card" id="complete-project">
+        <h2 class="section-heading">Complete Your Project</h2>
+        <div class="rec-grid">
+          <article class="rec-item">
+            <div>
+              <h3>Quilt Binding Calculator</h3>
+              <p>Finished sizing your backing? Calculate exact straight-of-grain or bias binding strips and yardage for the same quilt.</p>
+            </div>
+            <a class="rec-link" href="../quilt-binding-calculator/">Open Binding Calculator →</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- How it works + Batting Quick Chart -->
+      <section class="card" id="guide-section">
+        <div id="seoBlocks">
+        <div class="seo-block">
+          <h2>How the Quilt Backing &amp; Batting Calculator Works</h2>
+          <p>First, we add your chosen overage to all four sides of your quilt top (Wt = W + 2 × O, Lt = L + 2 × O). Domestic machine or hand quilting typically needs 3 inches per side (6 inches total), while longarm quilting frames require at least 4 inches per side (8 inches total) for clamps and leaders.</p>
+          <p>Next, we subtract a 2-inch selvage allowance from your bolt width to find your usable fabric width (for example, 44&quot; quilting cotton gives 42&quot; usable width). If your target backing fits within one usable width, you only need a single piece. Otherwise, we calculate the panels needed in both directions using a sturdy 1/2&quot; seam allowance (1&quot; net width lost per seam) and automatically choose the layout that uses the least fabric—unless you lock Directional Print to keep patterns upright.</p>
+        </div>
+        <div class="seo-block">
+          <h2>Standard 44&quot; Cotton vs. 108&quot; Wideback Fabric</h2>
+          <p>Standard 42&quot;–44&quot; quilting cotton is easy to match to your quilt top and widely available, but any quilt wider than 42&quot; after overage requires piecing two or more panels. Using 108&quot; wideback eliminates seams completely on most Throw, Twin, and Queen quilts, saving piecing time and creating a smoother back—just remember that oversized King quilts (over 106&quot; finished) still need one seam even with 108&quot; wideback.</p>
+        </div>
+        </div>
+
+        <div class="chart-wrap" id="batting-chart">
+          <h2>Standard Pre-Packaged Quilt Batting Sizes</h2>
+          <p class="chart-note">Always match batting against your quilt top PLUS overage (typically +6&quot; to +8&quot; total width and length), not the finished quilt size alone.</p>
+          <div class="table-scroll">
+            <table class="quick-table">
+              <thead>
+                <tr>
+                  <th>Package Size</th>
+                  <th>Size (in)</th>
+                  <th>Size (cm)</th>
+                  <th>Best For (Finished Quilt Up To)</th>
+                </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td><strong>Craft</strong></td>
+                <td>36&quot; × 45&quot;</td>
+                <td>91 × 114 cm</td>
+                <td>30&quot; × 39&quot; (wall hangings, runners)</td>
+              </tr>
+              <tr>
+                <td><strong>Crib / Baby</strong></td>
+                <td>45&quot; × 60&quot;</td>
+                <td>114 × 152 cm</td>
+                <td>39&quot; × 54&quot; (baby &amp; crib quilts)</td>
+              </tr>
+              <tr>
+                <td><strong>Twin</strong></td>
+                <td>72&quot; × 90&quot;</td>
+                <td>183 × 229 cm</td>
+                <td>66&quot; × 84&quot; (throws &amp; twin beds)</td>
+              </tr>
+              <tr>
+                <td><strong>Full / Double</strong></td>
+                <td>81&quot; × 96&quot;</td>
+                <td>206 × 244 cm</td>
+                <td>75&quot; × 90&quot; (full beds)</td>
+              </tr>
+              <tr>
+                <td><strong>Queen</strong></td>
+                <td>90&quot; × 108&quot;</td>
+                <td>229 × 274 cm</td>
+                <td>84&quot; × 102&quot; (queen beds)</td>
+              </tr>
+              <tr>
+                <td><strong>King</strong></td>
+                <td>120&quot; × 120&quot;</td>
+                <td>305 × 305 cm</td>
+                <td>112&quot; × 112&quot; (king &amp; cal king)</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="faq-section">
+        <h2 class="section-heading">Frequently Asked Questions</h2>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>How much overage do I need for longarm vs. domestic quilting?</summary>
+            <div class="faq-answer">Most longarm quilters require at least 4 inches of extra backing and batting on every side (adding 8 inches total to both width and length) so the quilt can be pinned or clamped onto the frame leaders. If you are basting and quilting on a domestic sewing machine or by hand, 3 inches per side (6 inches total) is usually plenty.</div>
+          </details>
+          <details class="faq-item">
+            <summary>When is 108&quot; wideback worth buying?</summary>
+            <div class="faq-answer">For Throw, Twin, and Queen quilts, 108&quot; wideback lets you cut a seamless single-piece backing with zero piecing and often uses less total yardage than piecing three widths of 44&quot; cotton. Only oversized King quilts whose backing target exceeds 106&quot; on both sides still require one seam on 108&quot; fabric.</div>
+          </details>
+          <details class="faq-item">
+            <summary>What does Directional Print Fabric do?</summary>
+            <div class="faq-answer">When your backing fabric has a one-way print (like trees, text, or animals), turning panels sideways to save yardage would make the print lie on its side. Enabling Directional Print locks the calculator to vertical seams so every panel runs upright along the quilt length.</div>
+          </details>
+          <details class="faq-item">
+            <summary>How do I choose the right pre-packaged batting size?</summary>
+            <div class="faq-answer">Compare your minimum batting size (quilt top plus your overage on all four sides) against standard package dimensions. A package can be rotated 90 degrees if needed. If a Queen quilt top (90&quot; × 96&quot;) needs 4&quot; longarm overage per side (98&quot; × 104&quot;), a 90&quot; × 108&quot; Queen package is too narrow—step up to a 120&quot; × 120&quot; King package.</div>
+          </details>
+          <details class="faq-item">
+            <summary>Why does the calculator deduct 2&quot; for selvages and use 1/2&quot; seams?</summary>
+            <div class="faq-answer">Woven selvage edges are tighter than the rest of the fabric and can pucker after washing, so trimming about 1&quot; from each edge (2&quot; total) keeps your backing flat. Joining backing panels with a generous 1/2&quot; seam allowance (1&quot; net loss per seam) pressed open creates a strong, low-bulk seam that handles quilting tension safely.</div>
+          </details>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <span>Quilt Studio Tools — Free quilting calculators.</span>
+        <a href="../about/">About &amp; Contact</a>
+      </footer>
+    </div>
+
+    <button type="button" class="sticky-result-bar no-print" id="stickyResultBar" hidden>
+      <span class="sticky-bar-main" id="stickyBarText"></span>
+      <span class="sticky-bar-cta">View Plan</span>
+    </button>
+
+    <section class="print-only-card" id="printCard" aria-hidden="true">
+      <div class="print-card-header">
+        <div class="print-card-title" id="printCardTitle"></div>
+      </div>
+      <div class="print-write-lines">
+        <div class="print-line-row">
+          <span id="printProjectLabel"></span>
+          <span class="print-line"></span>
+        </div>
+        <div class="print-line-row">
+          <span id="printDateLabel"></span>
+          <span class="print-line"></span>
+        </div>
+      </div>
+      <div class="print-meta-row" id="printMetaRow"></div>
+      <div class="print-buy-box">
+        <div class="print-buy-label" id="printBuyLabel"></div>
+        <div class="print-buy-value" id="printBuyValue"></div>
+        <div class="print-buy-sub" id="printBuySub"></div>
+      </div>
+      <div class="print-instruction" id="printInstruction"></div>
+      <div class="print-breakdown" id="printBreakdown"></div>
+      <div class="print-diagram-wrap" id="printDiagramWrap"></div>
+      <div class="print-footer" id="printFooter"></div>
+    </section>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

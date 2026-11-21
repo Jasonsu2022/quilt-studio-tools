@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Quilt Binding Calculator — Instant Strips, Yardage & Cutting Diagram",
-    "description": "Free quilt binding calculator for straight-of-grain and continuous bias binding. Instantly find how many strips to cut, yardage or metres to buy at the fabric shop, and print a handy cutting card."
+    "title": "Quilt Binding Calculator — Fabric Yardage, Strips & Cutting Diagram",
+    "description": "Free quilt binding calculator for straight-of-grain and continuous bias binding. Instantly find how many strips to cut, exact fabric yardage or metres to buy at the shop, and print a handy cutting card."
   },
   "nav": {
     "siteName": "Quilt Studio Tools",
@@ -134,14 +134,14 @@
     ]
   },
   "recommendations": {
-    "heading": "Helpful Tools & Guides",
-    "disclosure": "Quick references from Quilt Studio Tools",
+    "heading": "Complete Your Project",
+    "disclosure": "More free tools from Quilt Studio Tools",
     "items": [
       {
-        "title": "Before-You-Cut Binding Checklist",
-        "desc": "Three quick habits to avoid short strips, wavy edges, and bulky binding seams.",
-        "cta": "Read tips",
-        "href": "#before-you-cut"
+        "title": "Quilt Backing & Batting Calculator",
+        "desc": "Calculate backing yardage, panel piecing layouts, and matching batting sizes for the same quilt.",
+        "cta": "Open Backing Calculator →",
+        "href": "../quilt-backing-calculator/"
       },
       {
         "title": "Standard Quilt Binding Quick Chart",
