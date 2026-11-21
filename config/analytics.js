@@ -5,7 +5,7 @@
  */
 window.SITE_ANALYTICS_CONFIG = {
   // Google Analytics 4 Measurement ID (e.g., "G-XXXXXXXXXX")
-  ga4MeasurementId: "",
+  ga4MeasurementId: "G-MPH3VDEYV0",
 
   // Microsoft Clarity Project ID (e.g., "xxxxxxxxxx")
   clarityProjectId: ""
